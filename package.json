@@ -21,6 +21,7 @@
     "@tailwindcss/vite": "^4.1.4",
     "@unhead/vue": "^2.0.8",
     "eslint": "^9.25.1",
+    "formidable": "^3.5.4",
     "nodemailer": "^6.10.1",
     "nuxt": "^3.16.2",
     "pinia": "^3.0.2",
