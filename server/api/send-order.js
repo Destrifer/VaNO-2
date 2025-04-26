@@ -157,7 +157,7 @@ export default defineEventHandler(async (event) => {
 
   const message = {
     from: "Мой сайт <info@centralprint.ru>",
-    to: ["destrifer@yandex.ru", fields.email],
+    to: ["info@centralprint.ru", fields.email],
     subject: `Новый заказ №${orderId}`,
     html: `
       <h2>Новый заказ №${orderId}</h2>
