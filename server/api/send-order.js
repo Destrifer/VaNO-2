@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import formidable from "formidable";
+import path from "path";
 
 export default defineEventHandler(async (event) => {
   const form = formidable({ multiples: true });
@@ -22,12 +23,12 @@ export default defineEventHandler(async (event) => {
     port: 465,
     secure: true,
     auth: {
-      user: "info@centralprint.ru",
-      pass: "yerltcmuhqckagiy",
+      user: "info@centralprint.ru", // замени на свой
+      pass: "yerltcmuhqckagiy", // замени на свой
     },
   });
 
-  let itemsHtml = "";
+  // Подготовка данных товаров
   const items = [];
   const itemIndexes = new Set();
 
@@ -45,7 +46,6 @@ export default defineEventHandler(async (event) => {
     const photoRedraw = fields[`items[${i}][photoRedraw]`] === "true";
     const comment = fields[`items[${i}][comment]`] || "";
 
-    // Собираем параметры (options)
     const options = [];
     for (const key in fields) {
       const optMatch = key.match(
@@ -58,6 +58,19 @@ export default defineEventHandler(async (event) => {
       }
     }
 
+    // Сбор файлов, относящихся к конкретной позиции
+    const relatedFiles = [];
+    for (const fKey in files) {
+      if (fKey.startsWith(`items[${i}][files]`)) {
+        const fileData = files[fKey];
+        if (Array.isArray(fileData)) {
+          fileData.forEach((f) => relatedFiles.push(f));
+        } else {
+          relatedFiles.push(fileData);
+        }
+      }
+    }
+
     items.push({
       title,
       price,
@@ -65,32 +78,41 @@ export default defineEventHandler(async (event) => {
       photoRedraw,
       comment,
       options,
-      index: i,
+      files: relatedFiles,
     });
   });
 
-  itemsHtml = items
+  // Генерация HTML письма
+  const itemsHtml = items
     .map(
-      (item) => `
-      <li style="margin-bottom:15px;">
+      (item, idx) => `
+      <li style="margin-bottom:20px;">
         <strong>${item.title}</strong> — ${item.price} ₽<br/>
         ${
           item.options.length
-            ? `<div style="margin-top:5px;"><em>Параметры:</em><ul style="margin:5px 0 5px 20px;">
+            ? `
+          <div style="margin-top:5px;">
+            <em>Параметры:</em>
+            <ul style="margin:5px 0 5px 20px;">
               ${item.options
                 .map((opt) => `<li>${opt.key}: ${opt.value}</li>`)
                 .join("")}
-              </ul></div>`
+            </ul>
+          </div>`
             : ""
         }
         ${
           item.simpleDesign || item.photoRedraw
-            ? `<div style="margin-top:5px;"><em>Дополнительные услуги:</em> ${[
-                item.simpleDesign ? "Простой дизайн" : "",
-                item.photoRedraw ? "Отрисовка по фото" : "",
-              ]
-                .filter(Boolean)
-                .join(", ")}</div>`
+            ? `
+          <div style="margin-top:5px;">
+            <em>Дополнительные услуги:</em> 
+            ${[
+              item.simpleDesign ? "Простой дизайн" : "",
+              item.photoRedraw ? "Отрисовка по фото" : "",
+            ]
+              .filter(Boolean)
+              .join(", ")}
+          </div>`
             : ""
         }
         ${
@@ -98,41 +120,44 @@ export default defineEventHandler(async (event) => {
             ? `<div style="margin-top:5px;"><em>Комментарий к макету:</em> ${item.comment}</div>`
             : ""
         }
+        ${
+          item.files.length
+            ? `
+          <div style="margin-top:5px;">
+            <em>Прикрепленные файлы:</em>
+            <ul style="margin:5px 0 5px 20px;">
+              ${item.files
+                .map(
+                  (file, i) =>
+                    `<li>${path.basename(file.originalFilename)}</li>`
+                )
+                .join("")}
+            </ul>
+          </div>`
+            : ""
+        }
       </li>
     `
     )
     .join("");
 
+  // Сбор всех вложений
   const attachments = [];
   let fileCounter = 1;
-
-  for (const key in files) {
-    if (key.startsWith("items[")) {
-      const fileData = files[key];
-
-      if (Array.isArray(fileData)) {
-        fileData.forEach((f) => {
-          attachments.push({
-            filename: `Заказ-${orderId}-Файл${fileCounter++}-${
-              f.originalFilename
-            }`,
-            path: f.filepath,
-          });
-        });
-      } else {
-        attachments.push({
-          filename: `Заказ-${orderId}-Файл${fileCounter++}-${
-            fileData.originalFilename
-          }`,
-          path: fileData.filepath,
-        });
-      }
-    }
-  }
+  items.forEach((item, idx) => {
+    item.files.forEach((f) => {
+      attachments.push({
+        filename: `Заказ-${orderId}-Товар${idx + 1}-Файл${fileCounter++}-${
+          f.originalFilename
+        }`,
+        path: f.filepath,
+      });
+    });
+  });
 
   const message = {
     from: "Мой сайт <info@centralprint.ru>",
-    to: ["info@centralprint.ru", fields.email],
+    to: ["destrifer@yandex.ru", fields.email],
     subject: `Новый заказ №${orderId}`,
     html: `
       <h2>Новый заказ №${orderId}</h2>
