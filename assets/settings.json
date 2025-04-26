@@ -1,0 +1,42 @@
+{
+  "materials": {
+    "paper_sticker": 45,
+    "polylaser": 150,
+    "muflon": 80,
+    "silver_film": 650
+  },
+  "lamination": {
+    "glossy": 30,
+    "matte": 30,
+    "soft_touch": 70
+  },
+  "print_price": [
+    { "to": 10, "price": 80 },
+    { "to": 50, "price": 60 },
+    { "to": 100, "price": 55 },
+    { "to": 200, "price": 50 },
+    { "to": 300, "price": 47 },
+    { "to": 400, "price": 45 },
+    { "to": 500, "price": 42 },
+    { "to": 750, "price": 40 },
+    { "to": 1000, "price": 37 },
+    { "to": 2000, "price": 35 },
+    { "to": 4000, "price": 32 },
+    { "to": 999999, "price": 30 }
+  ],
+  "cutting_price": [
+    { "to": 10, "price": 60 },
+    { "to": 24, "price": 80 },
+    { "to": 49, "price": 100 },
+    { "to": 85, "price": 150 },
+    { "to": 104, "price": 200 },
+    { "to": 150, "price": 250 },
+    { "to": 250, "price": 300 },
+    { "to": 999999, "price": 400 }
+  ],
+  "sheet": {
+    "width": 405,
+    "height": 290,
+    "margin": 3
+  }
+}
