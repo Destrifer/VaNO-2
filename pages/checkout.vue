@@ -1,6 +1,6 @@
 <script setup>
 import { useCartStore } from "@/stores/cart";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 
 const cart = useCartStore();
 
@@ -9,6 +9,16 @@ const phone = ref("");
 const email = ref("");
 const message = ref("");
 const submitted = ref(false);
+
+// Вычисляем общую сумму всех товаров в корзине
+const cartTotal = computed(() =>
+  cart.items.reduce((sum, item) => sum + item.price, 0)
+);
+
+// Удаление товара по индексу
+const removeItem = (index) => {
+  cart.items.splice(index, 1);
+};
 
 const submitOrder = async () => {
   message.value = "";
@@ -52,32 +62,45 @@ const submitOrder = async () => {
 
     <div v-else-if="!submitted">
       <h2 class="text-xl font-semibold mb-2">Товары в корзине:</h2>
-      <ul class="space-y-2 border p-4 rounded">
+
+      <ul class="space-y-4 border p-4 rounded">
         <li
           v-for="(item, index) in cart.items"
           :key="index"
-          class="border-b pb-2"
+          class="relative border-b pb-4"
         >
+          <button
+            @click="removeItem(index)"
+            class="absolute top-0 right-0 text-red-500 hover:text-red-700 text-xl"
+            title="Удалить"
+          >
+            ×
+          </button>
+
           <div class="font-semibold">{{ item.title }}</div>
           <ul class="text-sm text-gray-700">
             <li v-for="(val, key) in item.options" :key="key">
               {{ key }}: {{ val }}
             </li>
           </ul>
-          <div class="mt-1">
+          <div class="mt-2">
             Цена: <strong>{{ item.price }} ₽</strong>
           </div>
         </li>
       </ul>
 
-      <form class="mt-6 space-y-4" @submit.prevent="submitOrder">
+      <div class="text-right text-xl font-bold mt-6">
+        Общая сумма: <span class="text-green-600">{{ cartTotal }} ₽</span>
+      </div>
+
+      <form class="mt-8 space-y-4" @submit.prevent="submitOrder">
         <label class="block">
           Имя:
           <input
             v-model="name"
             type="text"
             required
-            class="mt-1 border px-2 py-1 w-full"
+            class="mt-1 border px-2 py-1 w-full rounded"
           />
         </label>
 
@@ -87,7 +110,7 @@ const submitOrder = async () => {
             v-model="phone"
             type="tel"
             required
-            class="mt-1 border px-2 py-1 w-full"
+            class="mt-1 border px-2 py-1 w-full rounded"
           />
         </label>
 
@@ -97,7 +120,7 @@ const submitOrder = async () => {
             v-model="email"
             type="email"
             required
-            class="mt-1 border px-2 py-1 w-full"
+            class="mt-1 border px-2 py-1 w-full rounded"
           />
         </label>
 
@@ -105,7 +128,7 @@ const submitOrder = async () => {
 
         <button
           type="submit"
-          class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow"
+          class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow w-full"
         >
           Отправить заказ
         </button>
