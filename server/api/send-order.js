@@ -8,13 +8,13 @@ export default defineEventHandler(async (event) => {
     port: 465,
     secure: true,
     auth: {
-      user: "m28173@yandex.ru", // ⚠️ замени на свой
-      pass: "ptrdliawdhfbjjkc",
+      user: "info@centralprint.ru", // ⚠️ замени на свой
+      pass: "yerltcmuhqckagiy",
     },
   });
 
   const message = {
-    from: "Мой сайт <m28173@yandex.ru>",
+    from: "Мой сайт <info@centralprint.ru>",
     to: ["destrifer@yandex.ru", body.email],
     subject: "Новый заказ с сайта",
     html: `
