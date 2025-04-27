@@ -1,10 +1,11 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import settings from "~/assets/settings.json";
 import { useAddToCart } from "~/composables/useAddToCart";
 
 const printPrices = settings.print_price;
 const cuttingPrices = settings.cutting_price;
+const foilPrices = settings.foil_price; // 🆕 фольгирование
 const sheet = settings.sheet;
 
 const tirazh = ref(1000);
@@ -12,7 +13,11 @@ const diameter = ref(50);
 const materialKey = ref("paper_sticker");
 const laminationKey = ref("soft_touch");
 const useLamination = ref(true);
+const useFoil = ref(false); // 🆕 чекбокс фольгирования
 const correctionMessage = ref("");
+
+const savedMaterial = ref("");
+const savedLamination = ref("");
 
 const { addProduct } = useAddToCart();
 
@@ -40,6 +45,11 @@ const result = computed(() => {
   const cuttingUnitPrice = getTierPrice(cuttingPrices, itemsPerSheet);
   const cuttingTotal = cuttingUnitPrice * sheetsNeeded;
 
+  const foilUnitPrice = useFoil.value
+    ? getTierPrice(foilPrices, sheetsNeeded)
+    : 0;
+  const foilTotal = useFoil.value ? foilUnitPrice * sheetsNeeded : 0;
+
   return {
     itemsPerSheet,
     sheetsNeeded,
@@ -47,8 +57,24 @@ const result = computed(() => {
     subtotal,
     cuttingUnitPrice,
     cuttingTotal,
-    total: subtotal + cuttingTotal,
+    foilUnitPrice,
+    foilTotal,
+    total: subtotal + cuttingTotal + foilTotal,
   };
+});
+
+// 🧠 Следим за изменением фольгирования
+watch(useFoil, (newVal) => {
+  if (newVal) {
+    savedMaterial.value = materialKey.value;
+    savedLamination.value = laminationKey.value;
+    materialKey.value = "muflon";
+    laminationKey.value = "soft_touch";
+    useLamination.value = true;
+  } else {
+    if (savedMaterial.value) materialKey.value = savedMaterial.value;
+    if (savedLamination.value) laminationKey.value = savedLamination.value;
+  }
 });
 
 const handleOrder = () => {
@@ -70,11 +96,13 @@ const handleOrder = () => {
     const lamination = useLamination.value
       ? settings.lamination[laminationKey.value]
       : 0;
+    const foil = useFoil.value ? getTierPrice(foilPrices, sheets) : 0;
     const unitPrice = getTierPrice(printPrices, sheets) + material + lamination;
     const subtotal = sheets * unitPrice;
     const cutting = getTierPrice(cuttingPrices, itemsPerSheet) * sheets;
+    const foilTotal = foil * sheets;
 
-    total = subtotal + cutting;
+    total = subtotal + cutting + foilTotal;
 
     if (total >= 2000 || currentTirazh > 100000) break;
     currentTirazh++;
@@ -85,7 +113,6 @@ const handleOrder = () => {
     tirazh.value = currentTirazh;
   }
 
-  // добавляем в корзину через общую функцию
   addProduct({
     title: "Круглые наклейки",
     options: {
@@ -93,6 +120,7 @@ const handleOrder = () => {
       диаметр: diameter.value,
       материал: materialKey.value,
       ламинация: useLamination.value ? laminationKey.value : "без ламинации",
+      фольгирование: useFoil.value ? "Да" : "Нет",
     },
     price: result.value.total,
   });
@@ -161,6 +189,13 @@ const handleOrder = () => {
           </label>
         </div>
       </div>
+
+      <div class="block">
+        <label class="flex items-center gap-2">
+          <input type="checkbox" v-model="useFoil" />
+          Добавить фольгирование
+        </label>
+      </div>
     </div>
 
     <div v-if="correctionMessage" class="text-orange-600 italic text-sm mt-2">
@@ -187,6 +222,11 @@ const handleOrder = () => {
         <li>
           Резка: {{ result.cuttingUnitPrice }}₽ × {{ result.sheetsNeeded }} =
           <strong>{{ result.cuttingTotal }}₽</strong>
+        </li>
+        <li v-if="useFoil">
+          Фольгирование: {{ result.foilUnitPrice }}₽ ×
+          {{ result.sheetsNeeded }} =
+          <strong>{{ result.foilTotal }}₽</strong>
         </li>
         <li class="text-lg font-bold mt-2">
           Итого: <span class="text-green-600">{{ result.total }}₽</span>

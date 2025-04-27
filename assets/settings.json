@@ -34,6 +34,24 @@
     { "to": 250, "price": 300 },
     { "to": 999999, "price": 400 }
   ],
+  "foil_price": [
+    { "to": 10, "price": 400 },
+    { "to": 30, "price": 350 },
+    { "to": 50, "price": 300 },
+    { "to": 100, "price": 250 },
+    { "to": 200, "price": 170 },
+    { "to": 300, "price": 150 },
+    { "to": 500, "price": 135 },
+    { "to": 999999, "price": 120 }
+  ],
+  "foil_colors": {
+    "серебро": "/img/foil/silver.jpg",
+    "золото": "/img/foil/gold.jpg",
+    "синий": "/img/foil/blue.jpg",
+    "красный": "/img/foil/red.jpg",
+    "зеленый": "/img/foil/green.jpg",
+    "бронза": "/img/foil/bronze.jpg"
+  },
   "sheet": {
     "width": 405,
     "height": 290,
