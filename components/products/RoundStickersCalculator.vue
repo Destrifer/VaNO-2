@@ -2,7 +2,7 @@
 import { ref, computed, watch } from "vue";
 import settings from "~/assets/settings.json";
 import { useAddToCart } from "~/composables/useAddToCart";
-import { NuxtImg } from "#components"; // Импорт NuxtImg для оптимизированных картинок
+import { NuxtImg } from "#components";
 
 const printPrices = settings.print_price;
 const cuttingPrices = settings.cutting_price;
@@ -10,7 +10,7 @@ const foilPrices = settings.foil_price;
 const foilColors = settings.foil_colors;
 const sheet = settings.sheet;
 
-const tirazh = ref(1000);
+const views = ref([{ qty: 1000 }]); // 🆕 Массив видов (по умолчанию один вид)
 const diameter = ref(50);
 const materialKey = ref("paper_sticker");
 const laminationKey = ref("soft_touch");
@@ -24,6 +24,10 @@ const savedLamination = ref("");
 
 const { addProduct } = useAddToCart();
 
+const totalTirazh = computed(() =>
+  views.value.reduce((sum, view) => sum + (Number(view.qty) || 0), 0)
+);
+
 const getTierPrice = (tiers, value) =>
   tiers.find((t) => value <= t.to)?.price ?? tiers.at(-1).price;
 
@@ -35,7 +39,7 @@ const result = computed(() => {
 
   if (!itemsPerSheet || itemsPerSheet === 0) return { total: 0 };
 
-  const sheetsNeeded = Math.ceil(tirazh.value / itemsPerSheet);
+  const sheetsNeeded = Math.ceil(totalTirazh.value / itemsPerSheet);
 
   const material = settings.materials[materialKey.value];
   const lamination = useLamination.value
@@ -66,7 +70,6 @@ const result = computed(() => {
   };
 });
 
-// Логика обработки фольгирования
 watch(useFoil, (newVal) => {
   if (newVal) {
     savedMaterial.value = materialKey.value;
@@ -87,6 +90,18 @@ watch(useFoil, (newVal) => {
   }
 });
 
+const addView = () => {
+  if (views.value.length < 5) {
+    views.value.push({ qty: 0 });
+  }
+};
+
+const removeView = (index) => {
+  if (views.value.length > 1) {
+    views.value.splice(index, 1);
+  }
+};
+
 const handleOrder = () => {
   correctionMessage.value = "";
 
@@ -97,7 +112,7 @@ const handleOrder = () => {
 
   if (!itemsPerSheet || itemsPerSheet === 0) return;
 
-  let currentTirazh = tirazh.value;
+  let currentTirazh = totalTirazh.value;
   let total = 0;
 
   while (true) {
@@ -118,15 +133,17 @@ const handleOrder = () => {
     currentTirazh++;
   }
 
-  if (currentTirazh !== tirazh.value) {
+  if (currentTirazh !== totalTirazh.value) {
     correctionMessage.value = `Тираж был увеличен до ${currentTirazh} для соблюдения минимальной суммы заказа в 2000 ₽.`;
-    tirazh.value = currentTirazh;
+    // Автоматически увеличиваем первый вид
+    const diff = currentTirazh - totalTirazh.value;
+    views.value[0].qty += diff;
   }
 
   addProduct({
     title: "Круглые наклейки",
     options: {
-      тираж: tirazh.value,
+      виды: views.value.map((view, idx) => `Вид ${idx + 1}: ${view.qty} шт.`),
       диаметр: diameter.value,
       материал: materialKey.value,
       ламинация: useLamination.value ? laminationKey.value : "без ламинации",
@@ -142,15 +159,41 @@ const handleOrder = () => {
     <h1 class="text-2xl font-bold">Калькулятор круглых наклеек</h1>
 
     <div class="space-y-4">
-      <label class="block">
-        Тираж:
-        <input
-          v-model.number="tirazh"
-          type="number"
-          min="1"
-          class="mt-1 border px-2 py-1 w-full"
-        />
-      </label>
+      <div>
+        <h2 class="text-xl font-semibold mb-2">Виды продукции:</h2>
+        <div
+          v-for="(view, index) in views"
+          :key="index"
+          class="flex items-center gap-2 mb-2"
+        >
+          <input
+            v-model.number="view.qty"
+            type="number"
+            min="1"
+            class="border px-2 py-1 w-24"
+            placeholder="Тираж"
+          />
+          <button
+            v-if="views.length > 1"
+            @click="removeView(index)"
+            class="text-red-500 hover:underline text-sm"
+          >
+            Удалить
+          </button>
+        </div>
+
+        <button
+          v-if="views.length < 5"
+          @click="addView"
+          class="text-blue-600 hover:underline text-sm mt-2"
+        >
+          + Добавить вид
+        </button>
+
+        <div class="text-gray-600 mt-2">
+          Суммарный тираж: <strong>{{ totalTirazh }}</strong>
+        </div>
+      </div>
 
       <label class="block">
         Диаметр (мм):
