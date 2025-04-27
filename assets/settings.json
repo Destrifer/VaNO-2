@@ -45,12 +45,12 @@
     { "to": 999999, "price": 120 }
   ],
   "foil_colors": {
-    "серебро": "/img/foil/silver.jpg",
-    "золото": "/img/foil/gold.jpg",
-    "синий": "/img/foil/blue.jpg",
-    "красный": "/img/foil/red.jpg",
-    "зеленый": "/img/foil/green.jpg",
-    "бронза": "/img/foil/bronze.jpg"
+    "серебро": "/images/foil/silver.png",
+    "золото": "/images/foil/gold.png",
+    "синий": "/images/foil/blue.png",
+    "красный": "/images/foil/red.png",
+    "зеленый": "/images/foil/green.png",
+    "бронза": "/images/foil/bronze.png"
   },
   "sheet": {
     "width": 405,

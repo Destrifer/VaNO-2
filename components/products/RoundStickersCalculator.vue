@@ -2,10 +2,12 @@
 import { ref, computed, watch } from "vue";
 import settings from "~/assets/settings.json";
 import { useAddToCart } from "~/composables/useAddToCart";
+import { NuxtImg } from "#components"; // Импорт NuxtImg для оптимизированных картинок
 
 const printPrices = settings.print_price;
 const cuttingPrices = settings.cutting_price;
-const foilPrices = settings.foil_price; // 🆕 фольгирование
+const foilPrices = settings.foil_price;
+const foilColors = settings.foil_colors;
 const sheet = settings.sheet;
 
 const tirazh = ref(1000);
@@ -13,7 +15,8 @@ const diameter = ref(50);
 const materialKey = ref("paper_sticker");
 const laminationKey = ref("soft_touch");
 const useLamination = ref(true);
-const useFoil = ref(false); // 🆕 чекбокс фольгирования
+const useFoil = ref(false);
+const foilColor = ref("серебро");
 const correctionMessage = ref("");
 
 const savedMaterial = ref("");
@@ -63,24 +66,30 @@ const result = computed(() => {
   };
 });
 
-// 🧠 Следим за изменением фольгирования
+// Логика обработки фольгирования
 watch(useFoil, (newVal) => {
   if (newVal) {
     savedMaterial.value = materialKey.value;
     savedLamination.value = laminationKey.value;
-    materialKey.value = "muflon";
+    if (materialKey.value === "paper_sticker") {
+      materialKey.value = "muflon";
+    }
     laminationKey.value = "soft_touch";
     useLamination.value = true;
   } else {
     if (savedMaterial.value) materialKey.value = savedMaterial.value;
-    if (savedLamination.value) laminationKey.value = savedLamination.value;
+    if (savedLamination.value) {
+      laminationKey.value = savedLamination.value;
+      useLamination.value = true;
+    } else {
+      useLamination.value = false;
+    }
   }
 });
 
 const handleOrder = () => {
   correctionMessage.value = "";
 
-  let currentTirazh = tirazh.value;
   const sizeWithMargin = Number(diameter.value) + sheet.margin * 2;
   const itemsPerRow = Math.floor(sheet.width / sizeWithMargin);
   const itemsPerCol = Math.floor(sheet.height / sizeWithMargin);
@@ -88,6 +97,7 @@ const handleOrder = () => {
 
   if (!itemsPerSheet || itemsPerSheet === 0) return;
 
+  let currentTirazh = tirazh.value;
   let total = 0;
 
   while (true) {
@@ -120,7 +130,7 @@ const handleOrder = () => {
       диаметр: diameter.value,
       материал: materialKey.value,
       ламинация: useLamination.value ? laminationKey.value : "без ламинации",
-      фольгирование: useFoil.value ? "Да" : "Нет",
+      фольгирование: useFoil.value ? `Да, цвет: ${foilColor.value}` : "Нет",
     },
     price: result.value.total,
   });
@@ -159,6 +169,7 @@ const handleOrder = () => {
             v-for="(price, key) in settings.materials"
             :value="key"
             :key="key"
+            :disabled="useFoil && key === 'paper_sticker'"
           >
             {{ key }} — {{ price }}₽
           </option>
@@ -167,7 +178,7 @@ const handleOrder = () => {
 
       <div class="block">
         <label class="flex items-center gap-2 mb-1">
-          <input type="checkbox" v-model="useLamination" />
+          <input type="checkbox" v-model="useLamination" :disabled="useFoil" />
           Добавить ламинацию
         </label>
 
@@ -177,6 +188,7 @@ const handleOrder = () => {
             <select
               v-model="laminationKey"
               class="mt-1 border px-2 py-1 w-full"
+              :disabled="useFoil"
             >
               <option
                 v-for="(price, key) in settings.lamination"
@@ -196,6 +208,43 @@ const handleOrder = () => {
           Добавить фольгирование
         </label>
       </div>
+
+      <div v-if="useFoil" class="space-y-4 mt-4">
+        <h3 class="text-lg font-semibold">Выберите цвет фольги:</h3>
+        <div class="grid grid-cols-3 gap-4">
+          <div
+            v-for="(img, color) in foilColors"
+            :key="color"
+            class="cursor-pointer border rounded p-2 flex flex-col items-center"
+            :class="foilColor === color ? 'border-blue-500' : 'border-gray-300'"
+            @click="foilColor = color"
+          >
+            <NuxtImg
+              :src="img"
+              alt=""
+              width="80"
+              height="80"
+              format="avif,webp,jpg"
+              class="rounded mb-2 object-cover"
+            />
+            <span class="text-sm text-center">{{ color }}</span>
+          </div>
+        </div>
+
+        <div class="mt-6">
+          <h4 class="text-md font-medium mb-2">
+            Предпросмотр выбранной фольги:
+          </h4>
+          <NuxtImg
+            :src="foilColors[foilColor]"
+            alt="Выбранная фольга"
+            width="400"
+            height="400"
+            format="avif,webp,jpg"
+            class="rounded shadow object-cover"
+          />
+        </div>
+      </div>
     </div>
 
     <div v-if="correctionMessage" class="text-orange-600 italic text-sm mt-2">
@@ -214,7 +263,8 @@ const handleOrder = () => {
         <li>
           Стоимость за лист (печать + материал{{
             useLamination ? " + ламинация" : ""
-          }}): <strong>{{ result.unitPrice }}₽</strong>
+          }}):
+          <strong>{{ result.unitPrice }}₽</strong>
         </li>
         <li>
           Сумма за печать и материалы: <strong>{{ result.subtotal }}₽</strong>
