@@ -10,7 +10,7 @@ const foilPrices = settings.foil_price;
 const foilColors = settings.foil_colors;
 const sheet = settings.sheet;
 
-const views = ref([{ qty: 1000 }]); // 🆕 Массив видов (по умолчанию один вид)
+const views = ref([{ qty: 1000 }]);
 const diameter = ref(50);
 const materialKey = ref("paper_sticker");
 const laminationKey = ref("soft_touch");
@@ -135,7 +135,6 @@ const handleOrder = () => {
 
   if (currentTirazh !== totalTirazh.value) {
     correctionMessage.value = `Тираж был увеличен до ${currentTirazh} для соблюдения минимальной суммы заказа в 2000 ₽.`;
-    // Автоматически увеличиваем первый вид
     const diff = currentTirazh - totalTirazh.value;
     views.value[0].qty += diff;
   }
@@ -152,12 +151,71 @@ const handleOrder = () => {
     price: result.value.total,
   });
 };
-</script>
 
+// ===== НОВЫЙ Блок Выгодных Тиражей =====
+const betterDeals = computed(() => {
+  const sizeWithMargin = Number(diameter.value) + sheet.margin * 2;
+  const itemsPerRow = Math.floor(sheet.width / sizeWithMargin);
+  const itemsPerCol = Math.floor(sheet.height / sizeWithMargin);
+  const itemsPerSheet = itemsPerRow * itemsPerCol;
+
+  if (!itemsPerSheet || itemsPerSheet === 0) return [];
+
+  const currentSheets = Math.ceil(totalTirazh.value / itemsPerSheet);
+  const currentPricePerSheet = getTierPrice(printPrices, currentSheets);
+
+  const deals = [];
+  let foundDeals = 0;
+
+  for (const tier of printPrices) {
+    if (tier.to <= currentSheets) continue;
+    if (foundDeals >= 4) break;
+
+    const neededSheets = tier.to;
+    const neededTirazh = neededSheets * itemsPerSheet;
+
+    const newPricePerSheet = getTierPrice(printPrices, neededSheets);
+    const unitPrice =
+      (newPricePerSheet +
+        settings.materials[materialKey.value] +
+        (useLamination.value ? settings.lamination[laminationKey.value] : 0) +
+        (useFoil.value ? getTierPrice(foilPrices, neededSheets) : 0)) /
+      itemsPerSheet;
+
+    const currentUnitPrice =
+      (currentPricePerSheet +
+        settings.materials[materialKey.value] +
+        (useLamination.value ? settings.lamination[laminationKey.value] : 0) +
+        (useFoil.value ? getTierPrice(foilPrices, currentSheets) : 0)) /
+      itemsPerSheet;
+
+    const saving = 100 - (unitPrice / currentUnitPrice) * 100;
+
+    if (saving > 0) {
+      deals.push({
+        neededTirazh: neededTirazh,
+        saving: saving.toFixed(1),
+        unitPrice: unitPrice.toFixed(2),
+      });
+      foundDeals++;
+    }
+  }
+
+  return deals;
+});
+
+const applyDeal = (deal) => {
+  const multiplier = deal.neededTirazh / totalTirazh.value;
+  views.value.forEach((view) => {
+    view.qty = Math.ceil(view.qty * multiplier);
+  });
+};
+</script>
 <template>
   <div class="max-w-2xl mx-auto p-6 space-y-6">
     <h1 class="text-2xl font-bold">Калькулятор круглых наклеек</h1>
 
+    <!-- Виды продукции -->
     <div class="space-y-4">
       <div>
         <h2 class="text-xl font-semibold mb-2">Виды продукции:</h2>
@@ -195,6 +253,7 @@ const handleOrder = () => {
         </div>
       </div>
 
+      <!-- Параметры изделия -->
       <label class="block">
         Диаметр (мм):
         <input
@@ -290,10 +349,12 @@ const handleOrder = () => {
       </div>
     </div>
 
+    <!-- Корректировка тиража -->
     <div v-if="correctionMessage" class="text-orange-600 italic text-sm mt-2">
       {{ correctionMessage }}
     </div>
 
+    <!-- Итоговый расчёт -->
     <div class="border-t pt-6">
       <h2 class="text-xl font-semibold mb-2">Расчёт:</h2>
       <ul class="space-y-1">
@@ -327,9 +388,47 @@ const handleOrder = () => {
       </ul>
     </div>
 
+    <!-- Блок выгодных тиражей -->
+    <div v-if="betterDeals.length" class="border-t pt-6 mt-6">
+      <h2 class="text-xl font-semibold mb-2">
+        Выгодные варианты увеличения тиража:
+      </h2>
+
+      <div class="overflow-x-auto">
+        <table class="min-w-full border text-sm text-center">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="border px-2 py-1">Экономия</th>
+              <th class="border px-2 py-1">Тираж</th>
+              <th class="border px-2 py-1">Цена за единицу</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="deal in betterDeals"
+              :key="deal.neededTirazh"
+              class="hover:bg-blue-100 cursor-pointer"
+              @click="applyDeal(deal)"
+            >
+              <td class="border px-2 py-1 text-green-600 font-semibold">
+                -{{ deal.saving }}%
+              </td>
+              <td class="border px-2 py-1">{{ deal.neededTirazh }}</td>
+              <td class="border px-2 py-1">{{ deal.unitPrice }} ₽</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="text-xs text-gray-500 mt-2 italic">
+        Нажмите на строку, чтобы выбрать соответствующий тираж
+      </p>
+    </div>
+
+    <!-- Кнопка заказа -->
     <button
       @click="handleOrder"
-      class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow mt-4"
+      class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow mt-6"
     >
       Заказать
     </button>
