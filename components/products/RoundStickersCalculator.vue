@@ -7,6 +7,7 @@ import ProductViews from "@/components/common/ProductViews.vue";
 import ProductOptions from "@/components/common/ProductOptions.vue";
 import FoilPreview from "@/components/common/FoilPreview.vue";
 import BetterDeals from "@/components/common/BetterDeals.vue";
+import RoundStickersPreview from "@/components/products/RoundStickersPreview.vue";
 
 const printPrices = settings.print_price;
 const cuttingPrices = settings.cutting_price;
@@ -90,7 +91,6 @@ watch(useFoil, (newVal) => {
   }
 });
 
-// Обработчик заказа
 const handleOrder = () => {
   correctionMessage.value = "";
 
@@ -163,28 +163,37 @@ const betterDeals = computed(() => {
     const neededSheets = tier.to;
     const neededTirazh = neededSheets * itemsPerSheet;
 
-    const newPricePerSheet = getTierPrice(printPrices, neededSheets);
-    const unitPrice =
-      (newPricePerSheet +
-        settings.materials[materialKey.value] +
-        (useLamination.value ? settings.lamination[laminationKey.value] : 0) +
-        (useFoil.value ? getTierPrice(foilPrices, neededSheets) : 0)) /
-      itemsPerSheet;
+    const printCost = getTierPrice(printPrices, neededSheets);
+    const materialCost = settings.materials[materialKey.value];
+    const laminationCost = useLamination.value
+      ? settings.lamination[laminationKey.value]
+      : 0;
+    const foilCost = useFoil.value ? getTierPrice(foilPrices, neededSheets) : 0;
+    const cuttingCost = getTierPrice(cuttingPrices, itemsPerSheet);
 
-    const currentUnitPrice =
+    const totalCost =
+      (printCost + materialCost + laminationCost + foilCost + cuttingCost) *
+      neededSheets;
+
+    const fullUnitPrice = (totalCost / neededTirazh).toFixed(2);
+
+    const currentTotalCost =
       (currentPricePerSheet +
-        settings.materials[materialKey.value] +
-        (useLamination.value ? settings.lamination[laminationKey.value] : 0) +
-        (useFoil.value ? getTierPrice(foilPrices, currentSheets) : 0)) /
-      itemsPerSheet;
+        materialCost +
+        laminationCost +
+        (useFoil.value ? getTierPrice(foilPrices, currentSheets) : 0) +
+        cuttingCost) *
+      currentSheets;
 
-    const saving = 100 - (unitPrice / currentUnitPrice) * 100;
+    const currentUnitPrice = currentTotalCost / totalTirazh.value;
+
+    const saving = 100 - (totalCost / neededTirazh / currentUnitPrice) * 100;
 
     if (saving > 0) {
       deals.push({
         neededTirazh: neededTirazh,
         saving: saving.toFixed(1),
-        unitPrice: unitPrice.toFixed(2),
+        fullUnitPrice,
       });
       foundDeals++;
     }
@@ -202,53 +211,70 @@ const applyDeal = (deal) => {
 </script>
 
 <template>
-  <div class="max-w-2xl mx-auto p-6 space-y-6">
-    <h1 class="text-2xl font-bold">Калькулятор круглых наклеек</h1>
+  <div class="max-w-7xl mx-auto p-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+    <!-- Левая колонка -->
+    <div class="space-y-6">
+      <h1 class="text-2xl font-bold">Калькулятор круглых наклеек</h1>
 
-    <ProductViews v-model="views" />
+      <ProductViews v-model="views" />
 
-    <ProductOptions
-      :diameter="diameter"
-      v-model:material="materialKey"
-      v-model:lamination="laminationKey"
-      v-model:useLamination="useLamination"
-      v-model:useFoil="useFoil"
-      v-model:foilColor="foilColor"
-      @update:diameter="(val) => (diameter = val)"
-    />
+      <ProductOptions
+        :diameter="diameter"
+        v-model:material="materialKey"
+        v-model:lamination="laminationKey"
+        v-model:useLamination="useLamination"
+        v-model:useFoil="useFoil"
+        v-model:foilColor="foilColor"
+        @update:diameter="(val) => (diameter = val)"
+      />
 
-    <FoilPreview
-      v-if="useFoil"
-      :foilColor="foilColor"
-      @update:foilColor="(val) => (foilColor = val)"
-    />
+      <FoilPreview
+        v-if="useFoil"
+        :foilColor="foilColor"
+        @update:foilColor="(val) => (foilColor = val)"
+      />
 
-    <div v-if="correctionMessage" class="text-orange-600 italic text-sm">
-      {{ correctionMessage }}
+      <div v-if="correctionMessage" class="text-orange-600 italic text-sm">
+        {{ correctionMessage }}
+      </div>
     </div>
 
-    <div class="border-t pt-6">
-      <h2 class="text-xl font-semibold mb-2">Расчёт:</h2>
-      <ul class="space-y-1">
-        <li>
-          Изделий на листе: <strong>{{ result.itemsPerSheet }}</strong>
-        </li>
-        <li>
-          Необходимо листов: <strong>{{ result.sheetsNeeded }}</strong>
-        </li>
-        <li>
-          Итого: <strong class="text-green-600">{{ result.total }} ₽</strong>
-        </li>
-      </ul>
+    <!-- Центральная колонка -->
+    <div class="flex flex-col items-center space-y-6">
+      <RoundStickersPreview />
+      <BetterDeals :better-deals="betterDeals" @select-deal="applyDeal" />
     </div>
 
-    <BetterDeals :better-deals="betterDeals" @select-deal="applyDeal" />
+    <!-- Правая колонка -->
+    <div class="space-y-6">
+      <div class="border-t pt-6">
+        <h2 class="text-xl font-semibold mb-2">Итог заказа:</h2>
+        <ul class="space-y-1">
+          <li>
+            Изделий на листе: <strong>{{ result.itemsPerSheet }}</strong>
+          </li>
+          <li>
+            Листов нужно: <strong>{{ result.sheetsNeeded }}</strong>
+          </li>
+          <li class="text-lg font-bold mt-2">
+            Общая сумма:
+            <span class="text-green-600">{{ result.total }} ₽</span>
+          </li>
+          <li>
+            Цена за штуку:
+            <strong class="text-blue-600">
+              {{ (result.total / totalTirazh).toFixed(2) }} ₽
+            </strong>
+          </li>
+        </ul>
+      </div>
 
-    <button
-      @click="handleOrder"
-      class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow mt-6"
-    >
-      Заказать
-    </button>
+      <button
+        @click="handleOrder"
+        class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow"
+      >
+        Заказать
+      </button>
+    </div>
   </div>
 </template>

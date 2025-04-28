@@ -25,21 +25,25 @@ const emit = defineEmits(["select-deal"]);
           <tr
             v-for="deal in betterDeals"
             :key="deal.neededTirazh"
-            class="hover:bg-blue-100 cursor-pointer"
+            class="hover:bg-blue-100 cursor-pointer transition"
             @click="emit('select-deal', deal)"
           >
             <td class="border px-2 py-1 text-green-600 font-semibold">
               -{{ deal.saving }}%
             </td>
-            <td class="border px-2 py-1">{{ deal.neededTirazh }}</td>
-            <td class="border px-2 py-1">{{ deal.unitPrice }} ₽</td>
+            <td class="border px-2 py-1 font-medium">
+              {{ deal.neededTirazh }}
+            </td>
+            <td class="border px-2 py-1 font-semibold">
+              {{ deal.fullUnitPrice }} ₽
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
 
     <p class="text-xs text-gray-500 mt-2 italic">
-      Нажмите на строку, чтобы выбрать соответствующий тираж
+      Нажмите на строку, чтобы выбрать этот тираж
     </p>
   </div>
 </template>
