@@ -4,7 +4,9 @@
       class="w-full flex items-center justify-between px-[2cqw] md:px-[10cqw] py-[2cqw] md:py-[1cqw]"
     >
       <!-- Лого -->
-      <span class="font-bold text-medium font-display">CentralPrint</span>
+      <a href="/"
+        ><span class="font-bold text-medium font-display">CentralPrint</span></a
+      >
 
       <!-- Навигация (desktop) -->
       <Menu class="hidden md:flex" />
