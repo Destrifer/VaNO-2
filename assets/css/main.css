@@ -7,16 +7,6 @@
   --color-danger: #e53935; /* Красный — ошибки, внимание */
   --color-bg: #f5f5f5; /* Серый — фоновые блоки */
   --color-bone: #fdf6e3;
-
-  --fluid-xs: clamp(0.75rem, 0.8cqw, 9rem);
-  --text-small: clamp(1rem, 1cqw, 9rem);
-  --text-medium: clamp(1rem, 1.5cqw, 9rem);
-  --text-large: clamp(1.25rem, 2cqw, 9rem);
-  --fluid-xl: clamp(1.5rem, 3cqw, 9rem);
-
-  --gap-sm: clamp(0.5rem, 1cqw, 9rem);
-  --gap-md: clamp(1rem, 2cqw, 9rem);
-  --gap-lg: clamp(2rem, 4cqw, 9rem);
 }
 
 @layer base {

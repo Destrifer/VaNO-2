@@ -4,7 +4,9 @@
     <Header />
 
     <!-- Main -->
-    <main class="flex-1 container mx-auto py-8 mt-16">
+    <main
+      class="flex-1 px-4 sm:px-6 lg:px-8 py-8 mt-16 max-w-screen-xl mx-auto"
+    >
       <slot></slot>
     </main>
 
