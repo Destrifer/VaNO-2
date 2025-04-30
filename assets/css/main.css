@@ -1,15 +1,23 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #ffd600; /* Жёлтый — брендинг, кнопки */
-  --color-text: #000000; /* Чёрный — текст, навигация */
-  --color-link: #1e88e5; /* Синий — ссылки, интерфейс */
-  --color-danger: #e53935; /* Красный — ошибки, внимание */
-  --color-bg: #f5f5f5; /* Серый — фоновые блоки */
-  --color-bone: #fdf6e3;
+  --color-primary: #ffd600;
+  --color-text: #000000;
+  --color-link: #1e88e5;
+  --color-danger: #e53935;
+  --color-bg: #f5f5f5;
+
+  /* Типографика */
+  --text-xs: clamp(14px, 0.3vw + 0.5rem, 16px);
+  --text-sm: clamp(15px, 0.4vw + 0.65rem, 17px);
+  --text-md: clamp(17px, 0.7vw + 0.75rem, 21px);
 }
 
 @layer base {
+  html {
+    font-size: clamp(15px, 0.9vw + 0.5rem, 18px);
+  }
+
   body {
     font-family: var(--font-sans);
     color: var(--color-text);
@@ -27,5 +35,18 @@
 
   .font-display {
     font-family: "Urbanist", serif;
+  }
+
+  .text-xs-fluid {
+    font-size: var(--text-xs);
+  }
+
+  .text-sm-fluid {
+    font-size: var(--text-sm);
+  }
+
+  .text-md-fluid {
+    font-size: var(--text-md);
+    font-weight: 700;
   }
 }
