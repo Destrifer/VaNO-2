@@ -40,7 +40,6 @@
           <Icon name="simple-icons:whatsapp" size="30" />
         </a>
 
-        <!-- Телефон -->
         <a
           href="tel:+79998887766"
           class="flex items-center gap-2 group hover-scale"
@@ -49,7 +48,6 @@
           <span class="hidden xl:inline font-semibold">+7 (999) 888-77-66</span>
         </a>
 
-        <!-- Почта -->
         <a
           href="mailto:info@centralprint.ru"
           class="flex items-center gap-2 group hover-scale"
@@ -64,19 +62,31 @@
       <!-- Кнопка с текстом (ПК) -->
       <NuxtLink
         to="/checkout"
-        class="hidden sm:flex gap-2 items-center uppercase ml-4 bg-text text-primary py-2 px-4 rounded-full font-semibold hover:bg-danger transition hover-scale"
+        class="relative hidden sm:flex gap-2 items-center uppercase ml-4 bg-text text-primary py-2 px-4 rounded-full font-semibold hover:bg-danger transition hover-scale"
       >
         <Icon name="solar:cart-5-outline" size="24" />
         Заказать
+        <span
+          v-if="cartCount > 0"
+          class="absolute -top-2 -right-2 bg-red-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center"
+        >
+          {{ cartCount }}
+        </span>
       </NuxtLink>
 
       <!-- Круглая иконка (мобайл) -->
       <NuxtLink
         to="/checkout"
-        class="flex sm:hidden items-center justify-center bg-text text-primary w-9 h-9 rounded-full hover:bg-danger transition hover-scale"
+        class="relative flex sm:hidden items-center justify-center bg-text text-primary w-9 h-9 rounded-full hover:bg-danger transition hover-scale"
         aria-label="Заказать"
       >
         <Icon name="solar:cart-5-outline" size="20" />
+        <span
+          v-if="cartCount > 0"
+          class="absolute -top-1 -right-1 bg-red-600 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center"
+        >
+          {{ cartCount }}
+        </span>
       </NuxtLink>
 
       <!-- Бургер -->
@@ -85,14 +95,13 @@
       </button>
     </div>
 
-    <!-- Бургер-меню -->
     <BurgerMenu :isOpen="menuOpen" @close="toggleMenu" />
   </header>
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { NuxtLink } from "#components";
+import { ref, computed } from "vue";
+import { useCartStore } from "~/stores/cart";
 import Menu from "~/components/Menu.vue";
 import BurgerMenu from "~/components/layout/BurgerMenu.vue";
 
@@ -100,4 +109,7 @@ const menuOpen = ref(false);
 function toggleMenu() {
   menuOpen.value = !menuOpen.value;
 }
+
+const cart = useCartStore();
+const cartCount = computed(() => cart.items.length);
 </script>
