@@ -30,7 +30,7 @@ const sizeClass = {
 }[props.size];
 
 const variantClass = {
-  primary: "bg-text text-primary hover:bg-link cursor-pointer",
+  primary: "bg-text text-primary hover:bg-danger cursor-pointer",
   outline: "border border-text text-text hover:bg-text hover:text-primary",
   danger: "bg-danger text-white hover:bg-red-600",
 }[props.variant];
