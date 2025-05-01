@@ -58,16 +58,23 @@
         </a>
       </nav>
 
-      <!-- Кнопка Заказать -->
-      <UiBaseButton
-        size="sm"
-        variant="primary"
+      <!-- Кнопка с текстом (ПК) -->
+      <NuxtLink
         to="/checkout"
-        class="hidden sm:flex gap-2 items-center uppercase ml-4"
+        class="hidden sm:flex gap-2 items-center uppercase ml-4 bg-text text-primary py-2 px-4 rounded-full font-semibold hover:bg-danger transition"
       >
-        <Icon name="solar:cart-5-outline" class="text-2xl" />
-        <span class="hidden sm:inline">Заказать</span>
-      </UiBaseButton>
+        <Icon name="solar:cart-5-outline" size="24" />
+        Заказать
+      </NuxtLink>
+
+      <!-- Круглая иконка (мобайл) -->
+      <NuxtLink
+        to="/checkout"
+        class="flex sm:hidden items-center justify-center bg-text text-primary w-9 h-9 rounded-full hover:bg-danger transition"
+        aria-label="Заказать"
+      >
+        <Icon name="solar:cart-5-outline" size="20" />
+      </NuxtLink>
 
       <!-- Бургер -->
       <button @click="toggleMenu" class="md:hidden text-3xl ml-4">☰</button>
