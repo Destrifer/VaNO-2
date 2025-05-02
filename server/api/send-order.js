@@ -12,7 +12,6 @@ export default defineEventHandler(async (event) => {
     });
   });
 
-  // Генерация номера заказа
   const orderId = `${new Date()
     .toISOString()
     .slice(0, 10)
@@ -28,7 +27,6 @@ export default defineEventHandler(async (event) => {
     },
   });
 
-  // Подготовка данных товаров
   const items = [];
   const itemIndexes = new Set();
 
@@ -58,7 +56,6 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // Сбор файлов, относящихся к конкретной позиции
     const relatedFiles = [];
     for (const fKey in files) {
       if (fKey.startsWith(`items[${i}][files]`)) {
@@ -82,7 +79,8 @@ export default defineEventHandler(async (event) => {
     });
   });
 
-  // Генерация HTML письма
+  const orderComment = fields.orderComment || "";
+
   const itemsHtml = items
     .map(
       (item, idx) => `
@@ -141,7 +139,6 @@ export default defineEventHandler(async (event) => {
     )
     .join("");
 
-  // Сбор всех вложений
   const attachments = [];
   let fileCounter = 1;
   items.forEach((item, idx) => {
@@ -164,6 +161,7 @@ export default defineEventHandler(async (event) => {
       <p><strong>Имя:</strong> ${fields.name}</p>
       <p><strong>Телефон:</strong> ${fields.phone}</p>
       <p><strong>Email:</strong> ${fields.email}</p>
+      <p><strong>Комментарий к заказу:</strong> ${orderComment || "—"}</p>
       <h3>Товары:</h3>
       <ul>${itemsHtml}</ul>
     `,
