@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from "vue";
+import { products } from "~/assets/products.js";
 
 const showDropdown = ref(false);
 let timeout;
@@ -14,43 +15,6 @@ const close = () => {
     showDropdown.value = false;
   }, 150);
 };
-
-const products = [
-  { title: "Наклейки", href: "/stickers" },
-  { title: "Этикетки", href: "/labels" },
-  { title: "Каталоги", href: "/catalogs" },
-  { title: "Буклеты", href: "/booklets" },
-  { title: "Визитки", href: "/business-cards" },
-  { title: "Бирки и воблеры", href: "/tags" },
-  { title: "Календари", href: "/calendars" },
-  { title: "Листовки и флаеры", href: "/flyers" },
-  { title: "Блокноты", href: "/notebooks" },
-  { title: "Баннеры", href: "/banners" },
-  { title: "Роллапы", href: "/rollups" },
-  { title: "Таблички", href: "/signs" },
-  { title: "Презентации", href: "/presentations" },
-  { title: "Холсты", href: "/canvas" },
-  { title: "Плакаты", href: "/posters" },
-  { title: "Чертежи", href: "/blueprints" },
-  { title: "Грамоты", href: "/certificates" },
-  { title: "Благодарности", href: "/gratitudes" },
-  { title: "Сертификаты", href: "/licenses" },
-  { title: "Хенгеры", href: "/hangers" },
-  { title: "Бланки", href: "/forms" },
-  { title: "Бейджи", href: "/badges" },
-  { title: "Ценники", href: "/pricetags" },
-  { title: "Открытки", href: "/cards" },
-  { title: "Конверты", href: "/envelopes" },
-  { title: "Пригласительные", href: "/invites" },
-  { title: "Брошюры", href: "/brochures" },
-  { title: "Меню", href: "/menu" },
-  { title: "Журналы", href: "/magazines" },
-  { title: "Лифлеты", href: "/leaflets" },
-  { title: "Документация", href: "/docs" },
-  { title: "Билеты", href: "/tickets" },
-  { title: "Купоны", href: "/coupons" },
-  { title: "Тетради", href: "/notebooks2" },
-];
 </script>
 
 <template>
@@ -66,15 +30,23 @@ const products = [
           v-for="item in products"
           :key="item.title"
           :to="item.href"
-          class="hover:text-primary"
+          class="hover:text-primary flex items-center gap-2"
         >
+          <img
+            :src="item.icon"
+            alt="icon"
+            class="w-5 h-5 object-contain"
+            v-if="item.icon"
+          />
           {{ item.title }}
         </NuxtLink>
       </div>
     </div>
 
     <!-- Остальные пункты -->
-    <NuxtLink to="/delivery">Доставка и оплата</NuxtLink>
-    <NuxtLink to="/about">Контакты</NuxtLink>
+    <NuxtLink to="/delivery" class="hover:text-primary"
+      >Доставка и оплата</NuxtLink
+    >
+    <NuxtLink to="/about" class="hover:text-primary">Контакты</NuxtLink>
   </nav>
 </template>

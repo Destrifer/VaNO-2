@@ -2,6 +2,7 @@
 import { ref, computed, watch } from "vue";
 import { useAddToCart } from "~/composables/useAddToCart";
 import settings from "~/assets/settings.json";
+import { products } from "~/assets/products.js";
 
 import ProductViews from "@/components/common/ProductViews.vue";
 import ProductOptions from "@/components/common/ProductOptions.vue";
@@ -24,7 +25,6 @@ const foilColor = ref("серебро");
 
 const savedMaterial = ref("");
 const savedLamination = ref("");
-
 const correctionMessage = ref("");
 
 const { addProduct } = useAddToCart();
@@ -128,8 +128,12 @@ const handleOrder = () => {
     views.value[0].qty += diff;
   }
 
+  // Получаем иконку из products
+  const productInfo = products.find((p) => p.title === "Наклейки");
+
   addProduct({
-    title: "Круглые наклейки",
+    title: "Наклейки",
+    icon: productInfo?.icon || "/icons/default.svg",
     options: {
       виды: views.value.map((view, idx) => `Вид ${idx + 1}: ${view.qty} шт.`),
       диаметр: diameter.value,
@@ -141,7 +145,6 @@ const handleOrder = () => {
   });
 };
 
-// Выгодные тиражи
 const betterDeals = computed(() => {
   const sizeWithMargin = Number(diameter.value) + sheet.margin * 2;
   const itemsPerRow = Math.floor(sheet.width / sizeWithMargin);

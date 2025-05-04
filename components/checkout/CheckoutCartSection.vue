@@ -1,4 +1,5 @@
 <script setup>
+import { computed } from "vue";
 import { useCartStore } from "@/stores/cart";
 
 const cart = useCartStore();
@@ -52,8 +53,8 @@ const cartTotal = computed(() => {
 </script>
 
 <template>
-  <div class="space-y-4 w-full">
-    <h2 class="text-xl font-bold">Ваш заказ</h2>
+  <div class="space-y-6 w-full">
+    <h2 class="text-2xl font-bold">Ваш заказ</h2>
 
     <div v-if="cart.items.length === 0" class="text-gray-600">
       Ваша корзина пуста.
@@ -63,7 +64,7 @@ const cartTotal = computed(() => {
       <li
         v-for="(item, index) in cart.items"
         :key="index"
-        class="border p-4 rounded relative"
+        class="border p-4 rounded relative flex gap-4"
       >
         <button
           @click="removeItem(index)"
@@ -72,67 +73,80 @@ const cartTotal = computed(() => {
           ×
         </button>
 
-        <div class="font-semibold">{{ item.title }}</div>
-
-        <ul v-if="item.options" class="text-sm text-gray-700 mt-2">
-          <li v-for="(val, key) in item.options" :key="key">
-            {{ key }}: {{ val }}
-          </li>
-        </ul>
-
-        <div class="mt-2">
-          Базовая цена: <strong>{{ item.price }} ₽</strong>
-        </div>
-
-        <div class="mt-4 space-y-2">
-          <label class="flex items-center gap-2">
-            <input type="checkbox" v-model="item.simpleDesign" /> Простой дизайн
-            (+900 ₽)
-          </label>
-          <label class="flex items-center gap-2">
-            <input type="checkbox" v-model="item.photoRedraw" /> Отрисовка по
-            фото (+500 ₽)
-          </label>
-        </div>
-
-        <div class="mt-4">
-          <input
-            type="file"
-            multiple
-            accept=".jpg,.jpeg,.png,.tiff,.svg,.pdf,.ai,.psd,.rar,.zip"
-            @change="onFilesChange($event, index)"
-            class="border p-2 rounded w-full"
+        <!-- Иконка -->
+        <div class="w-16 h-16 flex-shrink-0">
+          <img
+            :src="item.icon || '/icons/default.svg'"
+            alt="Иконка"
+            class="w-full h-full object-contain rounded"
           />
-          <div v-if="item.files?.length" class="space-y-2 mt-2">
-            <div
-              v-for="(file, fileIndex) in item.files"
-              :key="fileIndex"
-              class="flex items-center justify-between bg-gray-100 p-2 rounded"
-            >
-              <span class="text-sm truncate">{{ file.name }}</span>
-              <button
-                @click="removeFile(index, fileIndex)"
-                class="text-red-500 hover:text-red-700"
+        </div>
+
+        <!-- Информация -->
+        <div class="flex-1 space-y-2">
+          <div class="font-semibold text-lg">{{ item.title }}</div>
+
+          <ul v-if="item.options" class="text-sm text-gray-700">
+            <li v-for="(val, key) in item.options" :key="key">
+              {{ key }}: {{ val }}
+            </li>
+          </ul>
+
+          <div>
+            Базовая цена: <strong>{{ item.price }} ₽</strong>
+          </div>
+
+          <div class="space-y-1">
+            <label class="flex items-center gap-2">
+              <input type="checkbox" v-model="item.simpleDesign" />
+              Простой дизайн (+900 ₽)
+            </label>
+            <label class="flex items-center gap-2">
+              <input type="checkbox" v-model="item.photoRedraw" />
+              Отрисовка по фото (+500 ₽)
+            </label>
+          </div>
+
+          <div>
+            <input
+              type="file"
+              multiple
+              accept=".jpg,.jpeg,.png,.tiff,.svg,.pdf,.ai,.psd,.rar,.zip"
+              @change="onFilesChange($event, index)"
+              class="border p-2 rounded w-full"
+            />
+            <div v-if="item.files?.length" class="mt-2 space-y-1">
+              <div
+                v-for="(file, fileIndex) in item.files"
+                :key="fileIndex"
+                class="flex items-center justify-between bg-gray-100 p-2 rounded"
               >
-                ×
-              </button>
+                <span class="text-sm truncate">{{ file.name }}</span>
+                <button
+                  @click="removeFile(index, fileIndex)"
+                  class="text-red-500 hover:text-red-700"
+                >
+                  ×
+                </button>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div v-if="item.files?.length" class="mt-4">
-          <textarea
-            v-model="item.comment"
-            placeholder="Комментарий к макету..."
-            class="border p-2 rounded w-full"
-            rows="3"
-          ></textarea>
+          <div v-if="item.files?.length">
+            <textarea
+              v-model="item.comment"
+              placeholder="Комментарий к макету..."
+              class="border p-2 rounded w-full mt-2"
+              rows="2"
+            ></textarea>
+          </div>
         </div>
       </li>
     </ul>
 
-    <div v-if="cart.items.length > 0" class="text-right text-lg font-bold">
-      Общая сумма: <span class="text-green-600">{{ cartTotal }} ₽</span>
+    <div v-if="cart.items.length > 0" class="text-right text-xl font-bold">
+      Общая сумма:
+      <span class="text-green-600">{{ cartTotal }} ₽</span>
     </div>
   </div>
 </template>
