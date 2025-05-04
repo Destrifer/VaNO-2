@@ -8,7 +8,7 @@ const name = ref("");
 const phone = ref("");
 const email = ref("");
 const delivery = ref("pickup");
-const payment = ref("card");
+const payment = ref("cash");
 const address = ref("");
 const agree = ref(false);
 const orderComment = ref("");
@@ -110,7 +110,13 @@ const submitOrder = async () => {
     <div class="mt-4 space-y-2">
       <h3 class="font-semibold">Доставка</h3>
       <label class="flex items-center gap-2">
-        <input type="radio" value="pickup" v-model="delivery" /> Самовывоз
+        <input type="radio" value="pickup" v-model="delivery" /> Самовывоз из
+        нашего <NuxtLink to="#">офиса</NuxtLink> на
+        <Icon
+          name="simple-icons:moscowmetro"
+          size="20"
+          class="text-[#d4212d] -mr-1"
+        />Нагатинская.
       </label>
       <label class="flex items-center gap-2">
         <input type="radio" value="courier" v-model="delivery" /> Курьер
@@ -126,8 +132,9 @@ const submitOrder = async () => {
 
     <div class="mt-4 space-y-2">
       <h3 class="font-semibold">Оплата</h3>
-      <label class="flex items-center gap-2">
-        <input type="radio" value="card" v-model="payment" /> Онлайн картой
+      <label class="flex items-center gap-2 text-gray-400 cursor-not-allowed">
+        <input type="radio" value="card" v-model="payment" disabled /> Онлайн
+        картой
       </label>
       <label class="flex items-center gap-2">
         <input type="radio" value="cash" v-model="payment" /> Наличные курьеру
