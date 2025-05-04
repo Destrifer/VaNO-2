@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-6xl mx-auto p-6 flex flex-col md:flex-row gap-6">
+  <div class="mx-auto p-6 flex flex-col md:flex-row gap-6">
     <!-- Левая колонка -->
     <CheckoutCartSection />
 

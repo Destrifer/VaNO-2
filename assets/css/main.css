@@ -55,4 +55,8 @@
   .hover-scale {
     @apply transition-transform duration-200 ease-in-out hover:scale-105;
   }
+
+  .container {
+    max-width: 1440px;
+  }
 }
