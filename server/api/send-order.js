@@ -32,9 +32,7 @@ export default defineEventHandler(async (event) => {
 
   for (const key in fields) {
     const match = key.match(/^items\[(\d+)]/);
-    if (match) {
-      itemIndexes.add(match[1]);
-    }
+    if (match) itemIndexes.add(match[1]);
   }
 
   itemIndexes.forEach((i) => {
@@ -49,22 +47,15 @@ export default defineEventHandler(async (event) => {
       const optMatch = key.match(
         new RegExp(`^items\\[${i}]\\[options]\\[(.+)]$`)
       );
-      if (optMatch) {
-        const optName = optMatch[1];
-        const optValue = fields[key];
-        options.push({ key: optName, value: optValue });
-      }
+      if (optMatch) options.push({ key: optMatch[1], value: fields[key] });
     }
 
     const relatedFiles = [];
     for (const fKey in files) {
       if (fKey.startsWith(`items[${i}][files]`)) {
         const fileData = files[fKey];
-        if (Array.isArray(fileData)) {
-          fileData.forEach((f) => relatedFiles.push(f));
-        } else {
-          relatedFiles.push(fileData);
-        }
+        if (Array.isArray(fileData)) relatedFiles.push(...fileData);
+        else relatedFiles.push(fileData);
       }
     }
 
@@ -81,13 +72,11 @@ export default defineEventHandler(async (event) => {
 
   const orderComment = fields.orderComment || "";
 
-  // Обрабатываем файл реквизитов
   let invoiceAttachment = null;
   if (files.invoiceFile) {
     const invFile = Array.isArray(files.invoiceFile)
       ? files.invoiceFile[0]
       : files.invoiceFile;
-
     invoiceAttachment = {
       filename: `Заказ-${orderId}-Реквизиты-${invFile.originalFilename}`,
       path: invFile.filepath,
@@ -97,40 +86,35 @@ export default defineEventHandler(async (event) => {
   const itemsHtml = items
     .map(
       (item) => `
-      <li style="margin-bottom:20px;">
-        <strong>${item.title}</strong> — ${item.price} ₽<br/>
-        ${
-          item.options.length
-            ? `<div style="margin-top:5px;"><em>Параметры:</em><ul style="margin:5px 0 5px 20px;">${item.options
-                .map((opt) => `<li>${opt.key}: ${opt.value}</li>`)
-                .join("")}</ul></div>`
-            : ""
-        }
-        ${
-          item.simpleDesign || item.photoRedraw
-            ? `<div style="margin-top:5px;"><em>Дополнительные услуги:</em> ${[
-                item.simpleDesign ? "Простой дизайн" : "",
-                item.photoRedraw ? "Отрисовка по фото" : "",
-              ]
-                .filter(Boolean)
-                .join(", ")}</div>`
-            : ""
-        }
-        ${
-          item.comment
-            ? `<div style="margin-top:5px;"><em>Комментарий к макету:</em> ${item.comment}</div>`
-            : ""
-        }
-        ${
-          item.files.length
-            ? `<div style="margin-top:5px;"><em>Прикрепленные файлы:</em><ul style="margin:5px 0 5px 20px;">${item.files
-                .map(
-                  (file) => `<li>${path.basename(file.originalFilename)}</li>`
-                )
-                .join("")}</ul></div>`
-            : ""
-        }
-      </li>`
+    <li style="margin-bottom:20px;">
+      <strong>${item.title}</strong> — ${item.price} ₽<br/>
+      ${
+        item.options.length
+          ? `<div><em>Параметры:</em><ul>${item.options
+              .map((opt) => `<li>${opt.key}: ${opt.value}</li>`)
+              .join("")}</ul></div>`
+          : ""
+      }
+      ${
+        item.simpleDesign || item.photoRedraw
+          ? `<div><em>Дополнительные услуги:</em> ${[
+              item.simpleDesign ? "Простой дизайн" : "",
+              item.photoRedraw ? "Отрисовка по фото" : "",
+            ]
+              .filter(Boolean)
+              .join(", ")}</div>`
+          : ""
+      }
+      ${item.comment ? `<div><em>Комментарий:</em> ${item.comment}</div>` : ""}
+      ${
+        item.files.length
+          ? `<div><em>Файлы:</em><ul>${item.files
+              .map((file) => `<li>${path.basename(file.originalFilename)}</li>`)
+              .join("")}</ul></div>`
+          : ""
+      }
+    </li>
+  `
     )
     .join("");
 
@@ -146,10 +130,7 @@ export default defineEventHandler(async (event) => {
       });
     });
   });
-
-  if (invoiceAttachment) {
-    attachments.push(invoiceAttachment);
-  }
+  if (invoiceAttachment) attachments.push(invoiceAttachment);
 
   const message = {
     from: "Мой сайт <info@centralprint.ru>",
@@ -160,19 +141,15 @@ export default defineEventHandler(async (event) => {
       <p><strong>Имя:</strong> ${fields.name}</p>
       <p><strong>Телефон:</strong> ${fields.phone}</p>
       <p><strong>Email:</strong> ${fields.email}</p>
-      
       <p><strong>Доставка:</strong> ${fields.delivery}</p>
       <p><strong>Оплата:</strong> ${fields.payment}</p>
       ${
-        fields.address
-          ? `<p><strong>Адрес доставки:</strong> ${fields.address}</p>`
-          : ""
+        fields.address ? `<p><strong>Адрес:</strong> ${fields.address}</p>` : ""
       }
-      
-      <p><strong>Комментарий к заказу:</strong> ${orderComment || "—"}</p>
+      <p><strong>Комментарий:</strong> ${orderComment || "—"}</p>
       ${
         invoiceAttachment
-          ? `<p><strong>Реквизиты прикреплены к письму.</strong></p>`
+          ? `<p><strong>Реквизиты прикреплены.</strong></p>`
           : ""
       }
       <h3>Товары:</h3>
@@ -183,7 +160,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     await transporter.sendMail(message);
-    return { ok: true };
+    return { ok: true, orderId };
   } catch (e) {
     console.error("Ошибка при отправке письма:", e);
     return { ok: false, error: e.message };

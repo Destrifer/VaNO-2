@@ -1,6 +1,7 @@
 <script setup>
 import { useCartStore } from "@/stores/cart";
 import { ref } from "vue";
+import { navigateTo } from "#app";
 
 const cart = useCartStore();
 
@@ -81,6 +82,7 @@ const submitOrder = async () => {
       submitted.value = true;
       message.value = "Спасибо! Ваш заказ отправлен.";
       cart.clearCart();
+      navigateTo(`/thank-you?order=${response.orderId}`);
     } else {
       message.value = "Ошибка при отправке заказа: " + response.error;
     }
