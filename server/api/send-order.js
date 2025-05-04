@@ -22,8 +22,8 @@ export default defineEventHandler(async (event) => {
     port: 465,
     secure: true,
     auth: {
-      user: "info@centralprint.ru", // замени на свой
-      pass: "yerltcmuhqckagiy", // замени на свой
+      user: "info@centralprint.ru",
+      pass: "yerltcmuhqckagiy",
     },
   });
 
@@ -81,36 +81,39 @@ export default defineEventHandler(async (event) => {
 
   const orderComment = fields.orderComment || "";
 
+  // Обрабатываем файл реквизитов
+  let invoiceAttachment = null;
+  if (files.invoiceFile) {
+    const invFile = Array.isArray(files.invoiceFile)
+      ? files.invoiceFile[0]
+      : files.invoiceFile;
+
+    invoiceAttachment = {
+      filename: `Заказ-${orderId}-Реквизиты-${invFile.originalFilename}`,
+      path: invFile.filepath,
+    };
+  }
+
   const itemsHtml = items
     .map(
-      (item, idx) => `
+      (item) => `
       <li style="margin-bottom:20px;">
         <strong>${item.title}</strong> — ${item.price} ₽<br/>
         ${
           item.options.length
-            ? `
-          <div style="margin-top:5px;">
-            <em>Параметры:</em>
-            <ul style="margin:5px 0 5px 20px;">
-              ${item.options
+            ? `<div style="margin-top:5px;"><em>Параметры:</em><ul style="margin:5px 0 5px 20px;">${item.options
                 .map((opt) => `<li>${opt.key}: ${opt.value}</li>`)
-                .join("")}
-            </ul>
-          </div>`
+                .join("")}</ul></div>`
             : ""
         }
         ${
           item.simpleDesign || item.photoRedraw
-            ? `
-          <div style="margin-top:5px;">
-            <em>Дополнительные услуги:</em> 
-            ${[
-              item.simpleDesign ? "Простой дизайн" : "",
-              item.photoRedraw ? "Отрисовка по фото" : "",
-            ]
-              .filter(Boolean)
-              .join(", ")}
-          </div>`
+            ? `<div style="margin-top:5px;"><em>Дополнительные услуги:</em> ${[
+                item.simpleDesign ? "Простой дизайн" : "",
+                item.photoRedraw ? "Отрисовка по фото" : "",
+              ]
+                .filter(Boolean)
+                .join(", ")}</div>`
             : ""
         }
         ${
@@ -120,22 +123,14 @@ export default defineEventHandler(async (event) => {
         }
         ${
           item.files.length
-            ? `
-          <div style="margin-top:5px;">
-            <em>Прикрепленные файлы:</em>
-            <ul style="margin:5px 0 5px 20px;">
-              ${item.files
+            ? `<div style="margin-top:5px;"><em>Прикрепленные файлы:</em><ul style="margin:5px 0 5px 20px;">${item.files
                 .map(
-                  (file, i) =>
-                    `<li>${path.basename(file.originalFilename)}</li>`
+                  (file) => `<li>${path.basename(file.originalFilename)}</li>`
                 )
-                .join("")}
-            </ul>
-          </div>`
+                .join("")}</ul></div>`
             : ""
         }
-      </li>
-    `
+      </li>`
     )
     .join("");
 
@@ -152,6 +147,10 @@ export default defineEventHandler(async (event) => {
     });
   });
 
+  if (invoiceAttachment) {
+    attachments.push(invoiceAttachment);
+  }
+
   const message = {
     from: "Мой сайт <info@centralprint.ru>",
     to: ["info@centralprint.ru", fields.email],
@@ -161,7 +160,21 @@ export default defineEventHandler(async (event) => {
       <p><strong>Имя:</strong> ${fields.name}</p>
       <p><strong>Телефон:</strong> ${fields.phone}</p>
       <p><strong>Email:</strong> ${fields.email}</p>
+      
+      <p><strong>Доставка:</strong> ${fields.delivery}</p>
+      <p><strong>Оплата:</strong> ${fields.payment}</p>
+      ${
+        fields.address
+          ? `<p><strong>Адрес доставки:</strong> ${fields.address}</p>`
+          : ""
+      }
+      
       <p><strong>Комментарий к заказу:</strong> ${orderComment || "—"}</p>
+      ${
+        invoiceAttachment
+          ? `<p><strong>Реквизиты прикреплены к письму.</strong></p>`
+          : ""
+      }
       <h3>Товары:</h3>
       <ul>${itemsHtml}</ul>
     `,

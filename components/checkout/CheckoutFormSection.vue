@@ -14,6 +14,11 @@ const agree = ref(false);
 const orderComment = ref("");
 const message = ref("");
 const submitted = ref(false);
+const invoiceFile = ref(null);
+
+const handleInvoiceFile = (event) => {
+  invoiceFile.value = event.target.files[0];
+};
 
 const submitOrder = async () => {
   message.value = "";
@@ -36,6 +41,10 @@ const submitOrder = async () => {
     formData.append("payment", payment.value);
     formData.append("address", address.value);
     formData.append("orderComment", orderComment.value);
+
+    if (invoiceFile.value) {
+      formData.append("invoiceFile", invoiceFile.value);
+    }
 
     cart.items.forEach((item, index) => {
       formData.append(`items[${index}][title]`, item.title);
@@ -142,6 +151,17 @@ const submitOrder = async () => {
       <label class="flex items-center gap-2">
         <input type="radio" value="invoice" v-model="payment" /> По счёту (юр.
         лица)
+      </label>
+    </div>
+
+    <div v-if="payment === 'invoice'" class="mt-2">
+      <label class="block">
+        Загрузите реквизиты:
+        <input
+          type="file"
+          @change="handleInvoiceFile"
+          class="border px-2 py-1 w-full rounded mt-1"
+        />
       </label>
     </div>
 
