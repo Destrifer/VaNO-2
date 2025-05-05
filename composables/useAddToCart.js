@@ -1,4 +1,5 @@
 import { useCartStore } from "@/stores/cart";
+import { toast } from "vue3-toastify";
 
 export function useAddToCart() {
   const cart = useCartStore();
@@ -10,7 +11,7 @@ export function useAddToCart() {
       options,
       price,
     });
-    alert("Товар добавлен в корзину!");
+    toast.success(`Товар «${title}» добавлен в корзину!`);
   };
 
   return {
