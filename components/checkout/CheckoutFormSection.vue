@@ -1,6 +1,6 @@
 <script setup>
 import { useCartStore } from "@/stores/cart";
-import { ref } from "vue";
+import { ref, computed, watch } from "vue";
 import { navigateTo } from "#app";
 
 const cart = useCartStore();
@@ -17,6 +17,54 @@ const message = ref("");
 const submitted = ref(false);
 const invoiceFile = ref(null);
 
+const nameError = ref("");
+const phoneError = ref("");
+const emailError = ref("");
+const agreeError = ref("");
+
+// Регулярки
+const nameRegex = /.{3,}/;
+const phoneRegex = /^\+7\s?\(?\d{3}\)?\s?\d{3}[-\s]?\d{2}[-\s]?\d{2}$/;
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Реактивные проверки
+watch(name, (val) => {
+  nameError.value = nameRegex.test(val.trim())
+    ? ""
+    : "Имя должно быть не меньше 3 символов.";
+});
+
+watch(phone, (val) => {
+  phoneError.value = phoneRegex.test(val)
+    ? ""
+    : "Введите корректный телефон, например: +7 (962) 903-48-37";
+});
+
+watch(email, (val) => {
+  emailError.value = emailRegex.test(val) ? "" : "Введите корректный email.";
+});
+
+watch(agree, (val) => {
+  agreeError.value = val ? "" : "Пожалуйста, подтвердите согласие.";
+});
+
+// Проверка формы
+const isFormValid = computed(() => {
+  return (
+    nameRegex.test(name.value.trim()) &&
+    phoneRegex.test(phone.value) &&
+    emailRegex.test(email.value) &&
+    agree.value
+  );
+});
+
+// Сброс глобального сообщения, если ошибки ушли
+watch(isFormValid, (val) => {
+  if (val && message.value === "Пожалуйста, заполните корректно все поля.") {
+    message.value = "";
+  }
+});
+
 const handleInvoiceFile = (event) => {
   invoiceFile.value = event.target.files[0];
 };
@@ -24,12 +72,17 @@ const handleInvoiceFile = (event) => {
 const submitOrder = async () => {
   message.value = "";
 
-  if (!name.value || !phone.value || !email.value) {
-    message.value = "Пожалуйста, заполните все поля.";
-    return;
-  }
-  if (!agree.value) {
-    message.value = "Пожалуйста, подтвердите согласие с условиями.";
+  if (!isFormValid.value) {
+    if (!nameRegex.test(name.value.trim()))
+      nameError.value = "Имя должно быть не меньше 3 символов.";
+    if (!phoneRegex.test(phone.value))
+      phoneError.value =
+        "Введите корректный телефон, например: +7 (962) 903-48-37";
+    if (!emailRegex.test(email.value))
+      emailError.value = "Введите корректный email.";
+    if (!agree.value) agreeError.value = "Пожалуйста, подтвердите согласие.";
+
+    message.value = "Пожалуйста, заполните корректно все поля.";
     return;
   }
 
@@ -96,27 +149,45 @@ const submitOrder = async () => {
   <div class="space-y-4 w-full">
     <h2 class="text-xl font-bold">Данные покупателя</h2>
 
-    <input
-      v-model="name"
-      type="text"
-      placeholder="Имя"
-      required
-      class="border px-2 py-1 w-full rounded"
-    />
-    <input
-      v-model="phone"
-      type="tel"
-      placeholder="Телефон"
-      required
-      class="border px-2 py-1 w-full rounded"
-    />
-    <input
-      v-model="email"
-      type="email"
-      placeholder="Email"
-      required
-      class="border px-2 py-1 w-full rounded"
-    />
+    <div>
+      <input
+        id="name"
+        v-model="name"
+        type="text"
+        placeholder="Имя"
+        required
+        minlength="3"
+        title="Введите ваше имя (не меньше 3 символов)"
+        class="border px-2 py-1 w-full rounded"
+      />
+      <div class="text-red-600 text-sm">{{ nameError }}</div>
+    </div>
+
+    <div>
+      <input
+        id="phone"
+        v-model="phone"
+        type="tel"
+        placeholder="Телефон"
+        required
+        title="Введите телефон, например: +7 (962) 903-48-37"
+        class="border px-2 py-1 w-full rounded"
+      />
+      <div class="text-red-600 text-sm">{{ phoneError }}</div>
+    </div>
+
+    <div>
+      <input
+        id="email"
+        v-model="email"
+        type="email"
+        placeholder="Email"
+        required
+        title="Введите корректный email"
+        class="border px-2 py-1 w-full rounded"
+      />
+      <div class="text-red-600 text-sm">{{ emailError }}</div>
+    </div>
 
     <div class="mt-4 space-y-2">
       <h3 class="font-semibold">Доставка</h3>
@@ -184,6 +255,7 @@ const submitOrder = async () => {
         >политикой конфиденциальности</a
       >
     </label>
+    <div class="text-red-600 text-sm">{{ agreeError }}</div>
 
     <div
       v-if="message"
