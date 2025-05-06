@@ -21,8 +21,9 @@ const nameError = ref("");
 const phoneError = ref("");
 const emailError = ref("");
 const agreeError = ref("");
+const addressError = ref("");
+const invoiceError = ref("");
 
-// Регулярки
 const nameRegex = /.{3,}/;
 const phoneRegex = /^\+7\s?\(?\d{3}\)?\s?\d{3}[-\s]?\d{2}[-\s]?\d{2}$/;
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -33,32 +34,55 @@ watch(name, (val) => {
     ? ""
     : "Имя должно быть не меньше 3 символов.";
 });
-
 watch(phone, (val) => {
   phoneError.value = phoneRegex.test(val)
     ? ""
     : "Введите корректный телефон, например: +7 (962) 903-48-37";
 });
-
 watch(email, (val) => {
   emailError.value = emailRegex.test(val) ? "" : "Введите корректный email.";
 });
-
 watch(agree, (val) => {
   agreeError.value = val ? "" : "Пожалуйста, подтвердите согласие.";
 });
+watch(address, (val) => {
+  if (delivery.value === "courier") {
+    addressError.value =
+      val.trim().length >= 5
+        ? ""
+        : "Введите адрес доставки (не меньше 5 символов).";
+  } else {
+    addressError.value = "";
+  }
+});
+watch(delivery, () => {
+  if (delivery.value !== "courier") addressError.value = "";
+});
+watch(invoiceFile, (val) => {
+  if (payment.value === "invoice") {
+    invoiceError.value = val ? "" : "Прикрепите файл с реквизитами.";
+  } else {
+    invoiceError.value = "";
+  }
+});
+watch(payment, () => {
+  if (payment.value !== "invoice") invoiceError.value = "";
+});
 
-// Проверка формы
 const isFormValid = computed(() => {
+  const addressOk =
+    delivery.value !== "courier" || address.value.trim().length >= 5;
+  const invoiceOk = payment.value !== "invoice" || invoiceFile.value;
   return (
     nameRegex.test(name.value.trim()) &&
     phoneRegex.test(phone.value) &&
     emailRegex.test(email.value) &&
-    agree.value
+    agree.value &&
+    addressOk &&
+    invoiceOk
   );
 });
 
-// Сброс глобального сообщения, если ошибки ушли
 watch(isFormValid, (val) => {
   if (val && message.value === "Пожалуйста, заполните корректно все поля.") {
     message.value = "";
@@ -81,6 +105,10 @@ const submitOrder = async () => {
     if (!emailRegex.test(email.value))
       emailError.value = "Введите корректный email.";
     if (!agree.value) agreeError.value = "Пожалуйста, подтвердите согласие.";
+    if (delivery.value === "courier" && address.value.trim().length < 5)
+      addressError.value = "Введите адрес доставки (не меньше 5 символов).";
+    if (payment.value === "invoice" && !invoiceFile.value)
+      invoiceError.value = "Прикрепите файл с реквизитами.";
 
     message.value = "Пожалуйста, заполните корректно все поля.";
     return;
@@ -203,13 +231,15 @@ const submitOrder = async () => {
       <label class="flex items-center gap-2">
         <input type="radio" value="courier" v-model="delivery" /> Курьер
       </label>
-      <input
-        v-if="delivery === 'courier'"
-        v-model="address"
-        type="text"
-        placeholder="Адрес доставки"
-        class="border px-2 py-1 w-full rounded"
-      />
+      <div v-if="delivery === 'courier'">
+        <input
+          v-model="address"
+          type="text"
+          placeholder="Адрес доставки"
+          class="border px-2 py-1 w-full rounded"
+        />
+        <div class="text-red-600 text-sm">{{ addressError }}</div>
+      </div>
     </div>
 
     <div class="mt-4 space-y-2">
@@ -236,6 +266,7 @@ const submitOrder = async () => {
           class="border px-2 py-1 w-full rounded mt-1"
         />
       </label>
+      <div class="text-red-600 text-sm">{{ invoiceError }}</div>
     </div>
 
     <label class="block mt-4">
