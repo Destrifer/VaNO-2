@@ -2,6 +2,7 @@
 import { useCartStore } from "@/stores/cart";
 import { ref, computed, watch } from "vue";
 import { navigateTo } from "#app";
+import { IMaskComponent } from "vue-imask";
 
 const cart = useCartStore();
 
@@ -25,10 +26,9 @@ const addressError = ref("");
 const invoiceError = ref("");
 
 const nameRegex = /.{3,}/;
-const phoneRegex = /^\+7\s?\(?\d{3}\)?\s?\d{3}[-\s]?\d{2}[-\s]?\d{2}$/;
+const phoneRegex = /^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/;
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Реактивные проверки
 watch(name, (val) => {
   nameError.value = nameRegex.test(val.trim())
     ? ""
@@ -37,7 +37,7 @@ watch(name, (val) => {
 watch(phone, (val) => {
   phoneError.value = phoneRegex.test(val)
     ? ""
-    : "Введите корректный телефон, например: +7 (962) 903-48-37";
+    : "Введите телефон в формате: +7 (962) 903-48-37";
 });
 watch(email, (val) => {
   emailError.value = emailRegex.test(val) ? "" : "Введите корректный email.";
@@ -100,8 +100,7 @@ const submitOrder = async () => {
     if (!nameRegex.test(name.value.trim()))
       nameError.value = "Имя должно быть не меньше 3 символов.";
     if (!phoneRegex.test(phone.value))
-      phoneError.value =
-        "Введите корректный телефон, например: +7 (962) 903-48-37";
+      phoneError.value = "Введите телефон в формате: +7 (962) 903-48-37";
     if (!emailRegex.test(email.value))
       emailError.value = "Введите корректный email.";
     if (!agree.value) agreeError.value = "Пожалуйста, подтвердите согласие.";
@@ -179,26 +178,22 @@ const submitOrder = async () => {
 
     <div>
       <input
-        id="name"
         v-model="name"
         type="text"
         placeholder="Имя"
         required
         minlength="3"
-        title="Введите ваше имя (не меньше 3 символов)"
         class="border px-2 py-1 w-full rounded"
       />
       <div class="text-red-600 text-sm">{{ nameError }}</div>
     </div>
 
     <div>
-      <input
-        id="phone"
+      <IMaskComponent
         v-model="phone"
-        type="tel"
+        :mask="'+7 (000) 000-00-00'"
+        :lazy="false"
         placeholder="Телефон"
-        required
-        title="Введите телефон, например: +7 (962) 903-48-37"
         class="border px-2 py-1 w-full rounded"
       />
       <div class="text-red-600 text-sm">{{ phoneError }}</div>
@@ -206,12 +201,10 @@ const submitOrder = async () => {
 
     <div>
       <input
-        id="email"
         v-model="email"
         type="email"
         placeholder="Email"
         required
-        title="Введите корректный email"
         class="border px-2 py-1 w-full rounded"
       />
       <div class="text-red-600 text-sm">{{ emailError }}</div>
