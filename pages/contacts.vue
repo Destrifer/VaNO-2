@@ -1,116 +1,127 @@
 <template>
-  <h1 class="text-3xl font-bold mb-8">Контакты</h1>
+  <div class="relative w-[600px] mx-auto mt-8">
+    <!-- Одна картинка с двумя персонажами -->
+    <img
+      src="/images/1.jpg"
+      alt="Два персонажа"
+      class="w-full h-full object-contain"
+    />
 
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-    <!-- Левая колонка -->
-    <section>
-      <h2 class="text-2xl font-semibold mb-4">Связаться с нами</h2>
-      <ul class="space-y-2 mb-4">
-        <li>
-          <strong>Телефон:</strong>
-          <a href="tel:+79991234567" class="text-blue-600 hover:underline"
-            >+7 (999) 123-45-67</a
-          >
-        </li>
-        <li>
-          <strong>Email:</strong>
-          <a
-            href="mailto:info@example.com"
-            class="text-blue-600 hover:underline"
-            >info@example.com</a
-          >
-        </li>
-      </ul>
+    <!-- Глаза персонажа 1 -->
+    <div
+      class="eye absolute w-8 h-8 bg-white rounded-full overflow-hidden left-[20%] top-[30%]"
+    >
+      <div
+        class="pupil w-3 h-3 bg-black rounded-full relative top-2 left-2 transition-transform"
+      ></div>
+    </div>
+    <div
+      class="eye absolute w-8 h-8 bg-white rounded-full overflow-hidden left-[35%] top-[30%]"
+    >
+      <div
+        class="pupil w-3 h-3 bg-black rounded-full relative top-2 left-2 transition-transform"
+      ></div>
+    </div>
 
-      <div class="flex space-x-4 mb-6">
-        <a href="#" class="text-blue-500 hover:text-blue-700">Telegram</a>
-        <a href="#" class="text-green-500 hover:text-green-700">WhatsApp</a>
-        <a href="#" class="text-purple-500 hover:text-purple-700">Viber</a>
-      </div>
+    <!-- Глаза персонажа 2 -->
+    <div
+      class="eye absolute w-8 h-8 bg-white rounded-full overflow-hidden left-[65%] top-[30%]"
+    >
+      <div
+        class="pupil w-3 h-3 bg-black rounded-full relative top-2 left-2 transition-transform"
+      ></div>
+    </div>
+    <div
+      class="eye absolute w-8 h-8 bg-white rounded-full overflow-hidden left-[80%] top-[30%]"
+    >
+      <div
+        class="pupil w-3 h-3 bg-black rounded-full relative top-2 left-2 transition-transform"
+      ></div>
+    </div>
+  </div>
 
-      <!-- Форма -->
-      <form @submit.prevent="submitForm" class="space-y-4">
-        <input
-          v-model="form.name"
-          type="text"
-          placeholder="Ваше имя"
-          class="w-full border rounded px-3 py-2"
-          required
-        />
-        <input
-          v-model="form.email"
-          type="email"
-          placeholder="Ваш email"
-          class="w-full border rounded px-3 py-2"
-          required
-        />
-        <textarea
-          v-model="form.message"
-          placeholder="Ваше сообщение"
-          class="w-full border rounded px-3 py-2"
-          required
-        ></textarea>
-        <button
-          type="submit"
-          class="w-full bg-blue-600 text-white rounded px-4 py-2 hover:bg-blue-700 transition"
-        >
-          Отправить
-        </button>
-      </form>
-
-      <p v-if="submitted" class="text-green-600 mt-2">
-        Спасибо! Ваше сообщение отправлено.
-      </p>
-    </section>
-
-    <!-- Правая колонка -->
-    <section>
-      <h2 class="text-2xl font-semibold mb-4">Наш офис</h2>
-      <ul class="space-y-2 mb-4">
-        <li><strong>Адрес:</strong> г. Москва, ул. Примерная, д. 1</li>
-        <li><strong>Режим работы:</strong> Пн–Пт: 9:00–18:00</li>
-      </ul>
-
-      <div class="mb-4">
-        <h3 class="text-lg font-medium mb-2">Схема проезда</h3>
-        <img
-          src="/images/map-scheme.jpg"
-          alt="Схема проезда"
-          class="w-full rounded border"
-        />
-      </div>
-
-      <div>
-        <h3 class="text-lg font-medium mb-2">Панорама</h3>
-        <img
-          src="/images/map-scheme.jpg"
-          alt="Панорама офиса"
-          class="w-full rounded border"
-        />
-      </div>
-    </section>
+  <!-- Форма -->
+  <div class="mt-8 flex justify-center">
+    <form class="space-y-4">
+      <input
+        type="text"
+        placeholder="Имя"
+        class="border px-4 py-2 block w-64"
+      />
+      <input
+        type="email"
+        placeholder="Email"
+        class="border px-4 py-2 block w-64"
+      />
+      <input
+        type="password"
+        placeholder="Пароль"
+        class="border px-4 py-2 block w-64"
+      />
+    </form>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { onMounted, onBeforeUnmount } from "vue";
 
-const form = ref({
-  name: "",
-  email: "",
-  message: "",
+const handleInput = (e) => {
+  const targetRect = e.target.getBoundingClientRect();
+
+  // Центр поля
+  const targetX = targetRect.left + targetRect.width / 2;
+  const targetY = targetRect.top + targetRect.height / 2;
+
+  // Вычисляем смещение по X в зависимости от длины текста
+  const textLength = e.target.value.length;
+  const maxLength = 30; // максимальная длина текста для полного "смещения"
+
+  // Фактор смещения: от 0 до 1
+  const factor = Math.min(textLength / maxLength, 1);
+
+  document.querySelectorAll(".eye").forEach((eye) => {
+    const pupil = eye.querySelector(".pupil");
+    const rect = eye.getBoundingClientRect();
+
+    const eyeCenterX = rect.left + rect.width / 2;
+    const eyeCenterY = rect.top + rect.height / 2;
+
+    // Считаем угол (по центру Y, но смещаем X в зависимости от текста)
+    const dx = targetX + targetRect.width * (factor - 0.5) - eyeCenterX;
+    const dy = targetY - eyeCenterY;
+    const angle = Math.atan2(dy, dx);
+
+    // Максимальный радиус движения зрачка
+    const radius = 10;
+    const pupilX = Math.cos(angle) * radius;
+    const pupilY = Math.sin(angle) * radius;
+
+    pupil.style.transform = `translate(${pupilX}px, ${pupilY}px)`;
+  });
+};
+
+const resetEyes = () => {
+  // Вернуть глаза в центр при blur
+  document.querySelectorAll(".eye .pupil").forEach((pupil) => {
+    pupil.style.transform = `translate(0, 0)`;
+  });
+};
+
+onMounted(() => {
+  document.querySelectorAll("form input").forEach((input) => {
+    input.addEventListener("focus", handleInput);
+    input.addEventListener("input", handleInput);
+    input.addEventListener("blur", resetEyes);
+  });
 });
 
-const submitted = ref(false);
-
-const submitForm = () => {
-  // Здесь можно отправить данные на сервер через fetch/Axios
-  console.log("Форма отправлена", form.value);
-  submitted.value = true;
-
-  // Очистка формы
-  form.value = { name: "", email: "", message: "" };
-};
+onBeforeUnmount(() => {
+  document.querySelectorAll("form input").forEach((input) => {
+    input.removeEventListener("focus", handleInput);
+    input.removeEventListener("input", handleInput);
+    input.removeEventListener("blur", resetEyes);
+  });
+});
 </script>
 
 <style scoped>
