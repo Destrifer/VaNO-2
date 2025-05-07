@@ -1,6 +1,6 @@
 <template>
   <div class="relative w-[600px] mx-auto mt-8">
-    <!-- Одна картинка с двумя персонажами -->
+    <!-- Блок с картинкой и персонажами -->
     <div class="relative overflow-hidden">
       <img src="/images/main.jpg" alt="Фон" />
 
@@ -19,6 +19,12 @@
         src="/images/front-mask.png"
         class="absolute top-[86px] left-[174px] w-[84px] h-auto pointer-events-none"
       />
+
+      <!-- Шторка -->
+      <div
+        class="absolute top-0 left-0 w-full h-full bg-white z-20 transition-transform duration-[2000ms] ease-in-out"
+        :class="{ '-translate-y-full': curtainOpened }"
+      ></div>
     </div>
 
     <!-- Глаза персонажа 1 -->
@@ -69,16 +75,33 @@
 </template>
 
 <script setup>
-import { onMounted, onBeforeUnmount } from "vue";
+import { ref, onMounted, onBeforeUnmount } from "vue";
+
+const curtainOpened = ref(false);
+const eyesActive = ref(false);
+let curtainSound = null;
+
+const handleFocus = () => {
+  if (!curtainOpened.value) {
+    curtainOpened.value = true;
+    curtainSound.play().catch((err) => {
+      console.log("Звук не проигрался:", err);
+    });
+  }
+};
 
 const handleInput = (e) => {
-  const targetRect = e.target.getBoundingClientRect();
+  // Начинаем следить только после начала ввода
+  if (!eyesActive.value) {
+    eyesActive.value = true;
+  }
 
-  // Центр поля
+  if (!eyesActive.value) return; // безопасность
+
+  const targetRect = e.target.getBoundingClientRect();
   const targetX = targetRect.left + targetRect.width / 2;
   const targetY = targetRect.top + targetRect.height / 2;
 
-  // Фактор для смещения вправо по мере набора текста
   const textLength = e.target.value.length;
   const maxLength = 30;
   const factor = Math.min(textLength / maxLength, 1);
@@ -90,20 +113,16 @@ const handleInput = (e) => {
     const eyeCenterX = rect.left + rect.width / 2;
     const eyeCenterY = rect.top + rect.height / 2;
 
-    // Вычисляем угол
     const dx = targetX + targetRect.width * (factor - 0.5) - eyeCenterX;
     const dy = targetY - eyeCenterY;
     const angle = Math.atan2(dy, dx);
 
-    // Настройки радиусов
-    const radius = 12; // общий радиус смещения
-    const maxVertical = 4; // ограничение по вертикали
+    const radius = 12;
+    const maxVertical = 4;
 
-    // Вычисляем смещение
     const pupilX = Math.cos(angle) * radius;
     let pupilY = Math.sin(angle) * radius;
 
-    // Ограничиваем вертикальное смещение
     if (pupilY > maxVertical) pupilY = maxVertical;
     if (pupilY < -maxVertical) pupilY = -maxVertical;
 
@@ -115,11 +134,14 @@ const resetEyes = () => {
   document.querySelectorAll(".eye .pupil").forEach((pupil) => {
     pupil.style.transform = `translate(0, 0)`;
   });
+  eyesActive.value = false; // отключаем слежку после blur
 };
 
 onMounted(() => {
+  curtainSound = new Audio("/sounds/door.mp3");
+
   document.querySelectorAll("form input").forEach((input) => {
-    input.addEventListener("focus", handleInput);
+    input.addEventListener("focus", handleFocus);
     input.addEventListener("input", handleInput);
     input.addEventListener("blur", resetEyes);
   });
@@ -127,7 +149,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   document.querySelectorAll("form input").forEach((input) => {
-    input.removeEventListener("focus", handleInput);
+    input.removeEventListener("focus", handleFocus);
     input.removeEventListener("input", handleInput);
     input.removeEventListener("blur", resetEyes);
   });
