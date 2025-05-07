@@ -22,34 +22,26 @@
     </div>
 
     <!-- Глаза персонажа 1 -->
-    <div
-      class="eye absolute w-8 h-8 bg-white rounded-full overflow-hidden left-[20%] top-[30%]"
-    >
+    <div class="eye absolute left-[85px] top-[162px]">
       <div
-        class="pupil w-3 h-3 bg-black rounded-full relative top-2 left-2 transition-transform"
+        class="pupil w-1 h-1 bg-black rounded-full relative top-2 left-2 transition-transform"
       ></div>
     </div>
-    <div
-      class="eye absolute w-8 h-8 bg-white rounded-full overflow-hidden left-[35%] top-[30%]"
-    >
+    <div class="eye absolute left-[153px] top-[165px]">
       <div
-        class="pupil w-3 h-3 bg-black rounded-full relative top-2 left-2 transition-transform"
+        class="pupil w-1 h-1 bg-black rounded-full relative top-2 left-2 transition-transform"
       ></div>
     </div>
 
     <!-- Глаза персонажа 2 -->
-    <div
-      class="eye absolute w-8 h-8 bg-white rounded-full overflow-hidden left-[65%] top-[30%]"
-    >
+    <div class="eye absolute left-[385px] top-[251px]">
       <div
-        class="pupil w-3 h-3 bg-black rounded-full relative top-2 left-2 transition-transform"
+        class="pupil w-1 h-1 bg-black rounded-full relative top-2 left-2 transition-transform"
       ></div>
     </div>
-    <div
-      class="eye absolute w-8 h-8 bg-white rounded-full overflow-hidden left-[80%] top-[30%]"
-    >
+    <div class="eye absolute left-[454px] top-[254px]">
       <div
-        class="pupil w-3 h-3 bg-black rounded-full relative top-2 left-2 transition-transform"
+        class="pupil w-1 h-1 bg-black rounded-full relative top-2 left-2 transition-transform"
       ></div>
     </div>
   </div>
@@ -86,11 +78,9 @@ const handleInput = (e) => {
   const targetX = targetRect.left + targetRect.width / 2;
   const targetY = targetRect.top + targetRect.height / 2;
 
-  // Вычисляем смещение по X в зависимости от длины текста
+  // Фактор для смещения вправо по мере набора текста
   const textLength = e.target.value.length;
-  const maxLength = 30; // максимальная длина текста для полного "смещения"
-
-  // Фактор смещения: от 0 до 1
+  const maxLength = 30;
   const factor = Math.min(textLength / maxLength, 1);
 
   document.querySelectorAll(".eye").forEach((eye) => {
@@ -100,22 +90,28 @@ const handleInput = (e) => {
     const eyeCenterX = rect.left + rect.width / 2;
     const eyeCenterY = rect.top + rect.height / 2;
 
-    // Считаем угол (по центру Y, но смещаем X в зависимости от текста)
+    // Вычисляем угол
     const dx = targetX + targetRect.width * (factor - 0.5) - eyeCenterX;
     const dy = targetY - eyeCenterY;
     const angle = Math.atan2(dy, dx);
 
-    // Максимальный радиус движения зрачка
-    const radius = 10;
+    // Настройки радиусов
+    const radius = 12; // общий радиус смещения
+    const maxVertical = 4; // ограничение по вертикали
+
+    // Вычисляем смещение
     const pupilX = Math.cos(angle) * radius;
-    const pupilY = Math.sin(angle) * radius;
+    let pupilY = Math.sin(angle) * radius;
+
+    // Ограничиваем вертикальное смещение
+    if (pupilY > maxVertical) pupilY = maxVertical;
+    if (pupilY < -maxVertical) pupilY = -maxVertical;
 
     pupil.style.transform = `translate(${pupilX}px, ${pupilY}px)`;
   });
 };
 
 const resetEyes = () => {
-  // Вернуть глаза в центр при blur
   document.querySelectorAll(".eye .pupil").forEach((pupil) => {
     pupil.style.transform = `translate(0, 0)`;
   });
