@@ -1,11 +1,25 @@
 <template>
   <div class="relative w-[600px] mx-auto mt-8">
     <!-- Одна картинка с двумя персонажами -->
-    <img
-      src="/images/1.jpg"
-      alt="Два персонажа"
-      class="w-full h-full object-contain"
-    />
+    <div class="relative overflow-hidden">
+      <img src="/images/main.jpg" alt="Фон" />
+
+      <!-- Катушки -->
+      <img
+        src="/images/left.png"
+        class="absolute w-[160px] top-[38px] left-[186px] cat"
+      />
+      <img
+        src="/images/right.png"
+        class="absolute w-[160px] top-[32px] left-[470px] cat-reverse"
+      />
+
+      <!-- Передний слой (маска) -->
+      <img
+        src="/images/front-mask.png"
+        class="absolute top-[86px] left-[174px] w-[84px] h-auto pointer-events-none"
+      />
+    </div>
 
     <!-- Глаза персонажа 1 -->
     <div
@@ -125,5 +139,31 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-/* При желании добавь мягкие анимации */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spin-reverse {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+.cat {
+  animation: spin 2s linear infinite;
+  transform-origin: center center;
+}
+
+.cat-reverse {
+  animation: spin-reverse 1s linear infinite; /* 2 раза быстрее */
+  transform-origin: center center;
+}
 </style>
