@@ -3,24 +3,20 @@
 
   <div class="grid grid-cols-1 lg:grid-cols-[1fr_min-content_1fr] gap-8">
     <!-- Левая колонка -->
-    <section class="text-center">
+    <section class="text-center flex flex-col gap-6">
       <h2 class="text-2xl font-semibold mb-4">Связаться с нами</h2>
-      <ul class="space-y-2 mb-4">
-        <li>
-          <a
-            href="tel:+79991234567"
-            class="text-blue-600 hover:underline text-2xl font-bold"
-            >+7 (999) 123-45-67</a
-          >
-        </li>
-        <li>
-          <a
-            href="mailto:info@example.com"
-            class="text-blue-600 hover:underline text-2xl font-bold"
-            >info@example.com</a
-          >
-        </li>
-      </ul>
+
+      <a
+        href="tel:+79991234567"
+        class="text-blue-600 hover:underline text-3xl font-bold"
+        >+7 (999) 123-45-67</a
+      >
+
+      <a
+        href="mailto:info@example.com"
+        class="text-blue-600 hover:underline text-3xl font-bold"
+        >info@example.com</a
+      >
 
       <div class="flex justify-center items-center gap-4 mb-4">
         <a href="https://t.me/yourbot" target="_blank" aria-label="Telegram">
@@ -34,6 +30,9 @@
           <Icon name="simple-icons:whatsapp" size="30" />
         </a>
       </div>
+
+      Что-то не так с качеством или сервисом? Пожаловаться можно напрямую нашему
+      директору. Да, он действительно сам читает каждый отзыв:).
 
       <!-- Форма -->
       <ContactFormSwitcher />

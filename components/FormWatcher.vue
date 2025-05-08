@@ -3,7 +3,7 @@
     <!-- Абсолютный блок с эффектом -->
     <div
       v-show="effectActive"
-      class="absolute left-1/2 transform -translate-x-1/2 w-[600px] z-50 overflow-hidden pointer-events-none"
+      class="absolute left-1/2 transform -translate-x-1/2 w-[500px] z-50 overflow-hidden pointer-events-none"
       style="bottom: calc(100% + 30px)"
     >
       <div class="relative w-full">
@@ -20,17 +20,17 @@
         <!-- Катушки -->
         <img
           src="/images/left.png"
-          class="absolute w-[160px] top-[38px] left-[186px] cat"
+          class="absolute w-[133px] top-[32px] left-[155px] cat"
         />
         <img
           src="/images/right.png"
-          class="absolute w-[160px] top-[32px] left-[470px] cat-reverse"
+          class="absolute w-[133px] top-[27px] left-[392px] cat-reverse"
         />
 
         <!-- Передний слой (маска) -->
         <img
           src="/images/front-mask.png"
-          class="absolute top-[86px] left-[174px] w-[84px] h-auto pointer-events-none"
+          class="absolute top-[71px] left-[146px] w-[70px] h-auto pointer-events-none"
         />
 
         <!-- Шторка -->
@@ -40,24 +40,24 @@
         ></div>
 
         <!-- Глаза персонажа 1 -->
-        <div class="eye absolute left-[85px] top-[162px]">
+        <div class="eye absolute left-[71px] top-[135px]">
           <div
             class="pupil w-1 h-1 bg-black rounded-full relative top-2 left-2 transition-transform"
           ></div>
         </div>
-        <div class="eye absolute left-[153px] top-[165px]">
+        <div class="eye absolute left-[128px] top-[138px]">
           <div
             class="pupil w-1 h-1 bg-black rounded-full relative top-2 left-2 transition-transform"
           ></div>
         </div>
 
         <!-- Глаза персонажа 2 -->
-        <div class="eye absolute left-[385px] top-[251px]">
+        <div class="eye absolute left-[323px] top-[210px]">
           <div
             class="pupil w-1 h-1 bg-black rounded-full relative top-2 left-2 transition-transform"
           ></div>
         </div>
-        <div class="eye absolute left-[454px] top-[254px]">
+        <div class="eye absolute left-[381px] top-[213px]">
           <div
             class="pupil w-1 h-1 bg-black rounded-full relative top-2 left-2 transition-transform"
           ></div>
