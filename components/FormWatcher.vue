@@ -1,31 +1,20 @@
 <template>
-  <div class="max-w-xl mx-auto mt-8 relative overflow-visible">
-    <!-- Верхний контент -->
-    <div
-      class="relative transition-transform duration-500 bg-white z-40"
-      :class="{
-        'absolute left-0 right-0': effectActive,
-        '-translate-y-[620px]': effectActive,
-      }"
-      style="min-height: 620px"
-    >
-      <slot name="top" />
-    </div>
-
-    <!-- Эффект с персонажами -->
+  <div class="max-w-xl mx-auto mt-8 relative">
+    <!-- Абсолютный блок с эффектом -->
     <div
       v-show="effectActive"
-      class="absolute top-0 left-1/2 transform -translate-x-1/2 w-[600px] origin-top z-20 overflow-hidden transition-opacity duration-500"
+      class="absolute left-1/2 transform -translate-x-1/2 w-[600px] z-50 overflow-hidden pointer-events-none"
+      style="bottom: calc(100% + 30px)"
     >
-      <!-- Кнопка закрыть -->
-      <button
-        @click="closeEffect"
-        class="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 z-30"
-      >
-        Закрыть
-      </button>
+      <div class="relative w-full">
+        <!-- Кнопка закрыть -->
+        <button
+          @click="closeEffect"
+          class="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 z-50 pointer-events-auto"
+        >
+          Закрыть
+        </button>
 
-      <div class="relative w-full overflow-hidden">
         <img src="/images/main.jpg" alt="Фон" class="w-full h-auto" />
 
         <!-- Катушки -->
@@ -76,8 +65,9 @@
       </div>
     </div>
 
-    <!-- Форма -->
-    <div class="mt-8 relative z-10 watcher-form-wrapper">
+    <!-- Контент (форма и любой другой контент) -->
+    <div class="relative z-10 watcher-form-wrapper">
+      <slot name="top" />
       <slot name="form" />
     </div>
   </div>
@@ -97,14 +87,12 @@ watch(effectActive, async (visible) => {
     curtainSound = new Audio("/sounds/door.mp3");
     curtainSound.volume = 1.0;
 
-    // Обработчики на input
     const inputs = document.querySelectorAll(".watcher-form-wrapper input");
     inputs.forEach((input) => {
       input.addEventListener("input", handleInput);
       input.addEventListener("blur", resetEyes);
     });
 
-    // Открытие: звук + шторка
     setTimeout(() => {
       curtainOpened.value = true;
       curtainSound?.play().catch((err) => {
