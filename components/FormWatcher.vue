@@ -74,7 +74,14 @@
 </template>
 
 <script setup>
-import { ref, watch, nextTick, onMounted } from "vue";
+import { ref, watch, nextTick, onMounted, defineProps } from "vue";
+
+const props = defineProps({
+  activateEffect: {
+    type: Boolean,
+    default: true,
+  },
+});
 
 const effectActive = ref(false);
 const curtainOpened = ref(false);
@@ -103,7 +110,7 @@ watch(effectActive, async (visible) => {
 });
 
 const handleFocus = () => {
-  if (!effectActive.value) {
+  if (!effectActive.value && props.activateEffect) {
     effectActive.value = true;
   }
 };

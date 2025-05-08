@@ -1,13 +1,9 @@
 <template>
-  <FormWatcher>
+  <FormWatcher :activateEffect="formType === 'director'">
     <template #form>
-      <Transition name="fade" mode="out-in">
-        <!-- Выбор блоков -->
-        <div
-          v-if="!showForm"
-          key="choice"
-          class="grid grid-cols-1 sm:grid-cols-2 gap-4"
-        >
+      <div>
+        <!-- Блок выбора -->
+        <div v-show="!showForm" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <!-- Левый блок -->
           <div
             class="flex flex-col items-center justify-center p-6 border rounded-lg hover:shadow-lg cursor-pointer transition"
@@ -35,8 +31,8 @@
           </div>
         </div>
 
-        <!-- Форма -->
-        <div v-else key="form">
+        <!-- Форма (всегда в DOM) -->
+        <div v-show="showForm">
           <h2 class="text-2xl font-semibold mb-4 text-center">
             {{
               formType === "positive"
@@ -45,26 +41,20 @@
             }}
           </h2>
 
-          <form @submit.prevent="submitForm" class="max-w-md mx-auto space-y-4">
+          <form class="max-w-md mx-auto space-y-4">
             <input
-              v-model="form.name"
               type="text"
               placeholder="Ваше имя"
               class="w-full border rounded px-3 py-2"
-              required
             />
             <input
-              v-model="form.email"
               type="email"
               placeholder="Ваш email"
               class="w-full border rounded px-3 py-2"
-              required
             />
             <textarea
-              v-model="form.message"
               placeholder="Ваше сообщение"
               class="w-full border rounded px-3 py-2"
-              required
             ></textarea>
             <button
               type="submit"
@@ -79,10 +69,6 @@
             </button>
           </form>
 
-          <p v-if="submitted" class="text-green-600 mt-2 text-center">
-            Спасибо! Ваше сообщение отправлено.
-          </p>
-
           <!-- Кнопка "Назад" -->
           <div class="mt-4 text-center">
             <button
@@ -93,41 +79,21 @@
             </button>
           </div>
         </div>
-      </Transition>
+      </div>
     </template>
   </FormWatcher>
 </template>
 
 <script setup>
 import { ref } from "vue";
-import FormWatcher from "@/components/FormWatcher.vue"; // 👈 добавлен импорт
+import FormWatcher from "@/components/FormWatcher.vue";
 
 const showForm = ref(false);
 const formType = ref(""); // 'positive' или 'director'
 
-const form = ref({
-  name: "",
-  email: "",
-  message: "",
-});
-
-const submitted = ref(false);
-
 const openForm = (type) => {
   formType.value = type;
   showForm.value = true;
-  submitted.value = false;
-};
-
-const submitForm = () => {
-  console.log(
-    `Форма отправлена (${
-      formType.value === "positive" ? "Позитивный отзыв" : "Директор"
-    }):`,
-    form.value
-  );
-  submitted.value = true;
-  form.value = { name: "", email: "", message: "" };
 };
 
 const resetForm = () => {
@@ -198,15 +164,5 @@ const resetForm = () => {
 
 .scared-shake:hover {
   animation: shake-scared 0.8s infinite;
-}
-
-/* Плавная смена */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s ease;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
 }
 </style>
