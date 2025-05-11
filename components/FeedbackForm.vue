@@ -42,6 +42,7 @@
               :lazy="false"
               placeholder="Ваш телефон"
               class="w-full border rounded px-3 py-2"
+              @focus="handlePhoneFocus"
             />
             <p v-if="phoneError" class="text-red-600 text-sm mt-1">
               {{ phoneError }}
@@ -112,6 +113,16 @@ const emailError = ref("");
 const phoneError = ref("");
 const messageError = ref("");
 const messageSent = ref(false);
+
+const handlePhoneFocus = (e) => {
+  // Вставить курсор сразу после "+7 ("
+  const el = e.target;
+  // Небольшая задержка нужна, чтобы дождаться рендера mask
+  setTimeout(() => {
+    const prefixLength = "+7 (".length;
+    el.setSelectionRange(prefixLength, prefixLength);
+  }, 0);
+};
 
 const validate = () => {
   let valid = true;
