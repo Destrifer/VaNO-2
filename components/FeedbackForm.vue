@@ -11,29 +11,54 @@
         </h2>
 
         <form @submit.prevent="submitForm" class="max-w-md mx-auto space-y-4">
-          <input
-            v-model="name"
-            type="text"
-            placeholder="Ваше имя"
-            class="w-full border rounded px-3 py-2"
-          />
-          <input
-            v-model="email"
-            type="email"
-            placeholder="Ваш email"
-            class="w-full border rounded px-3 py-2"
-          />
-          <input
-            v-model="phone"
-            type="text"
-            placeholder="Ваш телефон"
-            class="w-full border rounded px-3 py-2"
-          />
-          <textarea
-            v-model="message"
-            placeholder="Ваше сообщение"
-            class="w-full border rounded px-3 py-2"
-          ></textarea>
+          <div>
+            <input
+              v-model="name"
+              type="text"
+              placeholder="Ваше имя"
+              class="w-full border rounded px-3 py-2"
+            />
+            <p v-if="nameError" class="text-red-600 text-sm mt-1">
+              {{ nameError }}
+            </p>
+          </div>
+
+          <div>
+            <input
+              v-model="email"
+              type="email"
+              placeholder="Ваш email"
+              class="w-full border rounded px-3 py-2"
+            />
+            <p v-if="emailError" class="text-red-600 text-sm mt-1">
+              {{ emailError }}
+            </p>
+          </div>
+
+          <div>
+            <IMaskComponent
+              v-model="phone"
+              :mask="'+7 (000) 000-00-00'"
+              :lazy="false"
+              placeholder="Ваш телефон"
+              class="w-full border rounded px-3 py-2"
+            />
+            <p v-if="phoneError" class="text-red-600 text-sm mt-1">
+              {{ phoneError }}
+            </p>
+          </div>
+
+          <div>
+            <textarea
+              v-model="message"
+              placeholder="Ваше сообщение"
+              class="w-full border rounded px-3 py-2"
+              rows="4"
+            ></textarea>
+            <p v-if="messageError" class="text-red-600 text-sm mt-1">
+              {{ messageError }}
+            </p>
+          </div>
 
           <button
             type="submit"
@@ -66,26 +91,63 @@
 </template>
 
 <script setup>
-import { ref, defineProps, defineEmits } from "vue";
+import { ref } from "vue";
+import { IMaskComponent } from "vue-imask";
 import FormWatcher from "@/components/FormWatcher.vue";
 
+const emit = defineEmits(["back"]);
 const props = defineProps({
-  formType: {
-    type: String,
-    required: true,
-  },
+  formType: { type: String, required: true },
 });
 
-const emit = defineEmits(["back"]);
-
 const formWatcher = ref(null);
+
 const name = ref("");
 const email = ref("");
 const phone = ref("");
 const message = ref("");
+
+const nameError = ref("");
+const emailError = ref("");
+const phoneError = ref("");
+const messageError = ref("");
 const messageSent = ref(false);
 
+const validate = () => {
+  let valid = true;
+  nameError.value = "";
+  emailError.value = "";
+  phoneError.value = "";
+  messageError.value = "";
+
+  if (!name.value.trim() || name.value.trim().length < 3) {
+    nameError.value = "Введите не менее 3 символов.";
+    valid = false;
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email.value)) {
+    emailError.value = "Введите корректный email.";
+    valid = false;
+  }
+
+  const phoneRegex = /^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/;
+  if (phone.value && !phoneRegex.test(phone.value)) {
+    phoneError.value = "Введите телефон в формате: +7 (___) ___-__-__";
+    valid = false;
+  }
+
+  if (!message.value.trim()) {
+    messageError.value = "Поле сообщения обязательно.";
+    valid = false;
+  }
+
+  return valid;
+};
+
 const submitForm = async () => {
+  if (!validate()) return;
+
   const data = {
     name: name.value,
     email: email.value,
@@ -122,7 +184,7 @@ const finishForm = () => {
   messageSent.value = true;
   name.value = "";
   email.value = "";
-  phone.value = "";
+  phone.value = "+7 (";
   message.value = "";
 
   setTimeout(() => {
