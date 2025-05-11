@@ -1,154 +1,58 @@
 <template>
-  <FormWatcher ref="formWatcher" :activateEffect="formType === 'director'">
-    <template #form>
-      <div>
-        <!-- Блок выбора -->
-        <div v-show="!showForm" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <!-- Левый блок -->
-          <div
-            class="flex flex-col items-center justify-center p-6 border rounded-lg hover:shadow-lg cursor-pointer transition"
-            @click="openForm('positive')"
-          >
-            <p class="text-xl font-semibold mb-2">Написать нам</p>
-            <Icon
-              name="fluent-emoji:smiling-face-with-sunglasses"
-              size="80"
-              class="happy-bounce cursor-pointer"
-            />
-          </div>
-
-          <!-- Правый блок -->
-          <div
-            class="flex flex-col items-center justify-center p-6 border rounded-lg hover:shadow-lg cursor-pointer transition"
-            @click="openForm('director')"
-          >
-            <p class="text-xl font-semibold mb-2">Написать директору</p>
-            <Icon
-              name="fluent-emoji:pleading-face"
-              size="80"
-              class="scared-shake cursor-pointer"
-            />
-          </div>
-        </div>
-
-        <!-- Форма -->
-        <div v-show="showForm">
-          <h2 class="text-2xl font-semibold mb-4 text-center">
-            {{
-              formType === "positive"
-                ? "Спасибо за ваш позитивный отзыв!"
-                : "Обращение к директору"
-            }}
-          </h2>
-
-          <form @submit.prevent="submitForm" class="max-w-md mx-auto space-y-4">
-            <input
-              v-model="name"
-              type="text"
-              placeholder="Ваше имя"
-              class="w-full border rounded px-3 py-2"
-            />
-            <input
-              v-model="email"
-              type="email"
-              placeholder="Ваш email"
-              class="w-full border rounded px-3 py-2"
-            />
-            <textarea
-              v-model="message"
-              placeholder="Ваше сообщение"
-              class="w-full border rounded px-3 py-2"
-            ></textarea>
-            <button
-              type="submit"
-              :class="[
-                'w-full rounded px-4 py-2 transition',
-                formType === 'director'
-                  ? 'bg-red-600 hover:bg-red-700 text-white'
-                  : 'bg-blue-600 hover:bg-blue-700 text-white',
-              ]"
-            >
-              Отправить
-            </button>
-
-            <!-- Сообщение об успехе -->
-            <p
-              v-if="messageSent"
-              class="text-green-600 text-sm text-center mt-2"
-            >
-              Ваше сообщение успешно отправлено!
-            </p>
-          </form>
-
-          <!-- Кнопка "Назад" -->
-          <div class="mt-4 text-center">
-            <button
-              @click="resetForm"
-              class="text-sm text-gray-500 underline hover:text-gray-700"
-            >
-              ← Вернуться к выбору
-            </button>
-          </div>
-        </div>
+  <div>
+    <!-- Блок выбора -->
+    <div v-if="!showForm" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <!-- Левый блок -->
+      <div
+        class="flex flex-col items-center justify-center p-6 border rounded-lg hover:shadow-lg cursor-pointer transition"
+        @click="openForm('positive')"
+      >
+        <p class="text-xl font-semibold mb-2">Написать нам</p>
+        <Icon
+          name="fluent-emoji:smiling-face-with-sunglasses"
+          size="80"
+          class="happy-bounce"
+        />
       </div>
-    </template>
-  </FormWatcher>
+
+      <!-- Правый блок -->
+      <div
+        class="flex flex-col items-center justify-center p-6 border rounded-lg hover:shadow-lg cursor-pointer transition"
+        @click="openForm('director')"
+      >
+        <p class="text-xl font-semibold mb-2">Написать директору</p>
+        <Icon
+          name="fluent-emoji:pleading-face"
+          size="80"
+          class="scared-shake"
+        />
+      </div>
+    </div>
+
+    <!-- Подключение формы -->
+    <FeedbackForm v-if="showForm" :form-type="formType" @back="resetForm" />
+  </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
-import FormWatcher from "@/components/FormWatcher.vue";
+import FeedbackForm from "@/components/FeedbackForm.vue";
 
-const formWatcher = ref(null);
-const showForm = ref(false);
 const formType = ref(""); // 'positive' или 'director'
-const messageSent = ref(false);
-
-// Поля формы
-const name = ref("");
-const email = ref("");
-const message = ref("");
+const showForm = ref(false);
 
 const openForm = (type) => {
   formType.value = type;
   showForm.value = true;
-  messageSent.value = false;
-};
-
-const submitForm = () => {
-  if (formType.value === "director") {
-    formWatcher.value?.closeEffect();
-    setTimeout(() => {
-      finishForm();
-    }, 2200);
-  } else {
-    finishForm();
-  }
-};
-
-const finishForm = () => {
-  messageSent.value = true;
-  name.value = "";
-  email.value = "";
-  message.value = "";
-
-  setTimeout(() => {
-    messageSent.value = false;
-  }, 5000); // 5 секунд
 };
 
 const resetForm = () => {
-  showForm.value = false;
   formType.value = "";
-  messageSent.value = false;
-  name.value = "";
-  email.value = "";
-  message.value = "";
+  showForm.value = false;
 };
 </script>
 
 <style scoped>
-/* Радостная анимация */
 @keyframes jump-bounce {
   0% {
     transform: translateY(0) scale(1, 0.7);
@@ -166,12 +70,10 @@ const resetForm = () => {
     transform: translateY(0) scale(1, 0.7);
   }
 }
-
 .happy-bounce:hover {
   animation: jump-bounce 0.6s ease-in-out infinite;
 }
 
-/* Страх/дрожание */
 @keyframes shake-scared {
   0% {
     transform: translate(0, 0) rotate(0deg);
@@ -207,7 +109,6 @@ const resetForm = () => {
     transform: translate(0, 0) rotate(0deg);
   }
 }
-
 .scared-shake:hover {
   animation: shake-scared 0.8s infinite;
 }
