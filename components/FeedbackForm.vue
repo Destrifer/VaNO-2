@@ -61,6 +61,12 @@
             </p>
           </div>
 
+          <!-- Turnstile -->
+          <div id="turnstile-container" class="my-4 flex justify-center" />
+          <p v-if="captchaError" class="text-red-600 text-sm text-center mt-1">
+            {{ captchaError }}
+          </p>
+
           <button
             type="submit"
             :class="[
@@ -92,7 +98,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { IMaskComponent } from "vue-imask";
 import FormWatcher from "@/components/FormWatcher.vue";
 
@@ -107,20 +113,19 @@ const name = ref("");
 const email = ref("");
 const phone = ref("");
 const message = ref("");
+const captchaToken = ref("");
 
 const nameError = ref("");
 const emailError = ref("");
 const phoneError = ref("");
 const messageError = ref("");
+const captchaError = ref("");
 const messageSent = ref(false);
 
 const handlePhoneFocus = (e) => {
-  // Вставить курсор сразу после "+7 ("
-  const el = e.target;
-  // Небольшая задержка нужна, чтобы дождаться рендера mask
   setTimeout(() => {
     const prefixLength = "+7 (".length;
-    el.setSelectionRange(prefixLength, prefixLength);
+    e.target.setSelectionRange(prefixLength, prefixLength);
   }, 0);
 };
 
@@ -130,6 +135,7 @@ const validate = () => {
   emailError.value = "";
   phoneError.value = "";
   messageError.value = "";
+  captchaError.value = "";
 
   if (!name.value.trim() || name.value.trim().length < 3) {
     nameError.value = "Введите не менее 3 символов.";
@@ -153,6 +159,11 @@ const validate = () => {
     valid = false;
   }
 
+  if (!captchaToken.value) {
+    captchaError.value = "Подтвердите, что вы не робот.";
+    valid = false;
+  }
+
   return valid;
 };
 
@@ -165,6 +176,7 @@ const submitForm = async () => {
     phone: phone.value,
     message: message.value,
     to: props.formType,
+    captcha: captchaToken.value,
   };
 
   const send = async () => {
@@ -195,11 +207,41 @@ const finishForm = () => {
   messageSent.value = true;
   name.value = "";
   email.value = "";
-  phone.value = "+7 (";
+  phone.value = "";
   message.value = "";
+  captchaToken.value = "";
 
   setTimeout(() => {
     messageSent.value = false;
   }, 5000);
+
+  // перерендерить turnstile
+  renderTurnstile();
 };
+
+const renderTurnstile = () => {
+  window.turnstile?.render("#turnstile-container", {
+    sitekey: "0x4AAAAAABclCvvQuq4VT03C", // вставь свой публичный ключ
+    callback: (token) => {
+      captchaToken.value = token;
+      captchaError.value = "";
+    },
+    "error-callback": () => {
+      captchaError.value = "Ошибка капчи. Попробуйте ещё раз.";
+    },
+  });
+};
+
+onMounted(() => {
+  if (!window.turnstile) {
+    const script = document.createElement("script");
+    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js";
+    script.async = true;
+    script.defer = true;
+    script.onload = renderTurnstile;
+    document.head.appendChild(script);
+  } else {
+    renderTurnstile();
+  }
+});
 </script>

@@ -1,8 +1,30 @@
 import nodemailer from "nodemailer";
 
 export default defineEventHandler(async (event) => {
-  const { name, email, phone, message, to } = await readBody(event);
+  const { name, email, phone, message, to, captcha } = await readBody(event);
 
+  // Проверка капчи через Turnstile
+  const captchaSecret = "0x4AAAAAABclCi5KgYDmqd10_ZqGZGjnOAE"; // замени на свой приватный ключ
+
+  const verifyRes = await $fetch(
+    "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+    {
+      method: "POST",
+      body: new URLSearchParams({
+        secret: captchaSecret,
+        response: captcha,
+        // optional: add remoteip
+        // remoteip: getRequestIP(event)
+      }),
+    }
+  );
+
+  if (!verifyRes.success) {
+    console.warn("Проверка капчи не пройдена:", verifyRes);
+    return { ok: false, error: "Не пройдена проверка капчи" };
+  }
+
+  // --- Подготовка письма
   const subject =
     to === "director"
       ? "Обращение к директору с сайта"
@@ -22,7 +44,7 @@ export default defineEventHandler(async (event) => {
     secure: true,
     auth: {
       user: "info@centralprint.ru",
-      pass: "yerltcmuhqckagiy", // или используй process.env
+      pass: "yerltcmuhqckagiy", // Лучше вынести в process.env
     },
   });
 
