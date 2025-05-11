@@ -181,6 +181,10 @@ onMounted(() => {
     input.addEventListener("focus", handleFocus);
   });
 });
+
+defineExpose({
+  closeEffect,
+});
 </script>
 
 <style scoped>

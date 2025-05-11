@@ -1,5 +1,5 @@
 <template>
-  <FormWatcher :activateEffect="formType === 'director'">
+  <FormWatcher ref="formWatcher" :activateEffect="formType === 'director'">
     <template #form>
       <div>
         <!-- Блок выбора -->
@@ -41,7 +41,7 @@
             }}
           </h2>
 
-          <form class="max-w-md mx-auto space-y-4">
+          <form @submit.prevent="submitForm" class="max-w-md mx-auto space-y-4">
             <input
               type="text"
               placeholder="Ваше имя"
@@ -88,8 +88,25 @@
 import { ref } from "vue";
 import FormWatcher from "@/components/FormWatcher.vue";
 
+const formWatcher = ref(null);
 const showForm = ref(false);
 const formType = ref(""); // 'positive' или 'director'
+
+const submitForm = () => {
+  if (formType.value === "director") {
+    formWatcher.value?.closeEffect();
+
+    // Ждем окончания анимации и только потом "отправляем"
+    setTimeout(() => {
+      alert("Форма отправлена директору!");
+      resetForm(); // скрыть форму и вернуться к выбору
+    }, 2200);
+  } else {
+    // Для обычной формы — сразу "отправляем"
+    alert("Форма отправлена!");
+    resetForm();
+  }
+};
 
 const openForm = (type) => {
   formType.value = type;
