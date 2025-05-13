@@ -4,7 +4,7 @@
     <div
       v-show="effectActive"
       class="absolute left-1/2 transform -translate-x-1/2 w-[500px] z-50 overflow-hidden pointer-events-none"
-      style="bottom: calc(100% + 30px)"
+      style="bottom: calc(100% + 10px)"
     >
       <div class="relative w-full">
         <!-- Кнопка закрыть -->

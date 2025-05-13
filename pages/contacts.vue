@@ -1,41 +1,37 @@
 <template>
-  <h1 class="text-3xl font-bold mb-8 text-center">Контакты</h1>
+  <h1>Контакты</h1>
 
   <div class="grid grid-cols-1 lg:grid-cols-[1fr_min-content_1fr] gap-8">
     <!-- Левая колонка -->
     <section class="text-center flex flex-col gap-6">
-      <h2 class="text-2xl font-semibold mb-4">Связаться с нами</h2>
+      <h2>Связаться с нами</h2>
 
-      <a
-        href="tel:+79991234567"
-        class="text-blue-600 hover:underline text-3xl font-bold"
+      <a href="tel:+79991234567" class="text-3xl font-bold"
         >+7 (999) 123-45-67</a
       >
 
-      <a
-        href="mailto:info@example.com"
-        class="text-blue-600 hover:underline text-3xl font-bold"
+      <a href="mailto:info@example.com" class="text-3xl font-bold"
         >info@example.com</a
       >
 
-      <div class="flex justify-center items-center gap-4 mb-4">
+      <div class="flex justify-center items-center gap-4 my-4">
         <a href="https://t.me/yourbot" target="_blank" aria-label="Telegram">
-          <Icon name="simple-icons:telegram" size="30" />
+          <Icon name="simple-icons:telegram" size="40" />
         </a>
         <a
           href="https://wa.me/79998887766"
           target="_blank"
           aria-label="WhatsApp"
         >
-          <Icon name="simple-icons:whatsapp" size="30" />
+          <Icon name="simple-icons:whatsapp" size="40" />
         </a>
       </div>
 
-      Что-то не так с качеством или сервисом? Пожаловаться можно напрямую нашему
-      директору. Да, он действительно сам читает каждый отзыв:).
+      Оставьте положительный отзыв или напяшите напрямую нашему директору. Да,
+      он действительно сам читает каждый отзыв:).
 
       <!-- Форма -->
-      <ContactFormSwitcher />
+      <ContactFormSwitcher class="mt-4" />
     </section>
 
     <div class="hidden lg:block w-px bg-gray-300"></div>
