@@ -68,13 +68,13 @@ const cartTotal = computed(() => {
       >
         <button
           @click="removeItem(index)"
-          class="absolute top-2 right-2 text-red-500 hover:text-red-700 text-xl"
+          class="absolute top-0 right-2 text-3xl text-red-500 hover:text-red-700 hover:cursor-pointer"
         >
           ×
         </button>
 
         <!-- Иконка -->
-        <div class="w-16 h-16 flex-shrink-0">
+        <div class="w-32 h-32 flex-shrink-0">
           <img
             :src="item.icon || '/icons/default.svg'"
             alt="Иконка"
@@ -84,7 +84,7 @@ const cartTotal = computed(() => {
 
         <!-- Информация -->
         <div class="flex-1 space-y-2">
-          <div class="font-semibold text-lg">{{ item.title }}</div>
+          <div class="font-semibold text-2xl">{{ item.title }}</div>
 
           <ul v-if="item.options" class="text-sm text-gray-700">
             <li v-for="(val, key) in item.options" :key="key">
