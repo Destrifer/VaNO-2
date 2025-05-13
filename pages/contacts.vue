@@ -188,6 +188,7 @@ onMounted(() => {
   cursor: pointer;
   outline: none;
   box-shadow: none;
+  z-index: 99;
 }
 
 .custom-dialog {
