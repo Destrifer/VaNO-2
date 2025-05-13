@@ -86,9 +86,23 @@ const cartTotal = computed(() => {
         <div class="flex-1 space-y-2">
           <div class="font-semibold text-2xl">{{ item.title }}</div>
 
-          <ul v-if="item.options" class="text-sm text-gray-700">
+          <ul v-if="item.options" class="text-sm text-gray-700 space-y-1">
             <li v-for="(val, key) in item.options" :key="key">
-              {{ key }}: {{ val }}
+              <template v-if="key.toLowerCase() === 'тираж'">
+                <template v-if="Array.isArray(val)">
+                  <strong>Тираж:</strong>
+                  {{ val.reduce((sum, qty) => sum + qty, 0) }} шт.
+                  <ul class="pl-4 list-disc">
+                    <li v-for="(qty, i) in val" :key="i">
+                      Вид {{ i + 1 }}: {{ qty }} шт.
+                    </li>
+                  </ul>
+                </template>
+                <template v-else>
+                  <strong>Тираж:</strong> {{ val }} шт.
+                </template>
+              </template>
+              <template v-else> {{ key }}: {{ val }} </template>
             </li>
           </ul>
 

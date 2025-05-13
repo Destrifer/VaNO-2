@@ -131,11 +131,16 @@ const handleOrder = () => {
   // Получаем иконку из products
   const productInfo = products.find((p) => p.title === "Наклейки");
 
+  const viewOptions =
+    views.value.length === 1
+      ? totalTirazh.value
+      : views.value.map((view) => view.qty);
+
   addProduct({
     title: "Наклейки",
     icon: productInfo?.icon || "/icons/default.svg",
     options: {
-      виды: views.value.map((view, idx) => `Вид ${idx + 1}: ${view.qty} шт.`),
+      тираж: viewOptions,
       диаметр: diameter.value,
       материал: materialKey.value,
       ламинация: useLamination.value ? laminationKey.value : "без ламинации",
