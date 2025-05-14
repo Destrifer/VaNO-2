@@ -30,7 +30,7 @@ const close = () => {
           v-for="item in products"
           :key="item.title"
           :to="item.href"
-          class="hover:text-primary flex items-center gap-2"
+          class="flex items-center gap-2"
         >
           <img
             :src="item.icon"
@@ -44,9 +44,7 @@ const close = () => {
     </div>
 
     <!-- Остальные пункты -->
-    <NuxtLink to="/delivery" class="hover:text-primary"
-      >Доставка и оплата</NuxtLink
-    >
-    <NuxtLink to="/about" class="hover:text-primary">Контакты</NuxtLink>
+    <NuxtLink to="/delivery">Доставка и оплата</NuxtLink>
+    <NuxtLink to="/contacts">Контакты</NuxtLink>
   </nav>
 </template>

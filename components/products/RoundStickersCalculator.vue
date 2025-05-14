@@ -17,8 +17,8 @@ const sheet = settings.sheet;
 
 const views = ref([{ qty: 500 }]);
 const diameter = ref(50);
-const materialKey = ref("paper_sticker");
-const laminationKey = ref("soft_touch");
+const materialKey = ref("Самоклейка 80г/м² полуглянцевая");
+const laminationKey = ref("Soft touch 30 мкр");
 const useLamination = ref(true);
 const useFoil = ref(false);
 const foilColor = ref("серебро");
@@ -75,10 +75,10 @@ watch(useFoil, (newVal) => {
   if (newVal) {
     savedMaterial.value = materialKey.value;
     savedLamination.value = laminationKey.value;
-    if (materialKey.value === "paper_sticker") {
-      materialKey.value = "muflon";
+    if (materialKey.value.includes("Самоклейка")) {
+      materialKey.value = "Пленка Muflon 80г/м² глянцевая";
     }
-    laminationKey.value = "soft_touch";
+    laminationKey.value = "Soft touch 30 мкр";
     useLamination.value = true;
   } else {
     if (savedMaterial.value) materialKey.value = savedMaterial.value;
