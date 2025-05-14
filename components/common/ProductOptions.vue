@@ -1,6 +1,4 @@
 <script setup>
-import settings from "~/assets/settings.json";
-
 const props = defineProps({
   diameter: Number,
   material: String,
@@ -8,6 +6,8 @@ const props = defineProps({
   useLamination: Boolean,
   useFoil: Boolean,
   foilColor: String,
+  materials: Array, // [{ name, price, disabled }]
+  laminations: Object, // { key: price }
 });
 
 const emit = defineEmits([
@@ -22,6 +22,7 @@ const emit = defineEmits([
 
 <template>
   <div class="space-y-4">
+    <!-- Диаметр -->
     <label class="block">
       Диаметр (мм):
       <input
@@ -33,6 +34,7 @@ const emit = defineEmits([
       />
     </label>
 
+    <!-- Материал -->
     <label class="block">
       Материал:
       <select
@@ -41,16 +43,18 @@ const emit = defineEmits([
         @change="emit('update:material', $event.target.value)"
       >
         <option
-          v-for="(price, key) in settings.materials"
-          :key="key"
-          :value="key"
-          :disabled="useFoil && key === 'paper_sticker'"
+          v-for="item in materials"
+          :key="item.name"
+          :value="item.name"
+          :disabled="item.disabled"
+          :class="{ 'opacity-50': item.disabled }"
         >
-          {{ key }} — {{ price }}₽
+          {{ item.name }} — {{ item.price }}₽
         </option>
       </select>
     </label>
 
+    <!-- Ламинация -->
     <div class="block">
       <label class="flex items-center gap-2 mb-1">
         <input
@@ -71,11 +75,7 @@ const emit = defineEmits([
             @change="emit('update:lamination', $event.target.value)"
             :disabled="useFoil"
           >
-            <option
-              v-for="(price, key) in settings.lamination"
-              :key="key"
-              :value="key"
-            >
+            <option v-for="(price, key) in laminations" :key="key" :value="key">
               {{ key }} — {{ price }}₽
             </option>
           </select>
@@ -83,6 +83,7 @@ const emit = defineEmits([
       </div>
     </div>
 
+    <!-- Фольгирование -->
     <div class="block">
       <label class="flex items-center gap-2">
         <input

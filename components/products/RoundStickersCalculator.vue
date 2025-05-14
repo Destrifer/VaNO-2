@@ -71,6 +71,31 @@ const result = computed(() => {
   };
 });
 
+// ⛔️ материалы, которые нельзя использовать с фольгой
+const forbiddenMaterialsWhenFoil = [
+  "Самоклейка 80г/м² полуглянцевая",
+  "Самоклейка 80г/м² матовая (без покрытия)",
+];
+
+const isMaterialDisabled = (name) =>
+  useFoil.value && forbiddenMaterialsWhenFoil.includes(name);
+
+const materialsWithStatus = computed(() =>
+  Object.entries(settings.materials).map(([name, price]) => ({
+    name,
+    price,
+    disabled: isMaterialDisabled(name),
+  }))
+);
+
+const laminationsWithStatus = computed(() =>
+  Object.entries(settings.lamination).map(([name, price]) => ({
+    name,
+    price,
+    disabled: false, // возможно, пригодится для других калькуляторов
+  }))
+);
+
 watch(useFoil, (newVal) => {
   if (newVal) {
     savedMaterial.value = materialKey.value;
@@ -128,7 +153,6 @@ const handleOrder = () => {
     views.value[0].qty += diff;
   }
 
-  // Получаем иконку из products
   const productInfo = products.find((p) => p.title === "Наклейки");
 
   const viewOptions =
@@ -233,6 +257,8 @@ const applyDeal = (deal) => {
         v-model:useLamination="useLamination"
         v-model:useFoil="useFoil"
         v-model:foilColor="foilColor"
+        :materials="materialsWithStatus"
+        :laminations="settings.lamination"
         @update:diameter="(val) => (diameter = val)"
       />
 
