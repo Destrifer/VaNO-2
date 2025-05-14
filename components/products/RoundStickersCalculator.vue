@@ -141,7 +141,7 @@ const handleOrder = () => {
     icon: productInfo?.icon || "/icons/default.svg",
     options: {
       тираж: viewOptions,
-      диаметр: diameter.value,
+      диаметр: `${diameter.value} мм`,
       материал: materialKey.value,
       ламинация: useLamination.value ? laminationKey.value : "без ламинации",
       фольгирование: useFoil.value ? `Да, цвет: ${foilColor.value}` : "Нет",
