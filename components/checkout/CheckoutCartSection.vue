@@ -107,8 +107,8 @@ const cartTotal = computed(() => {
                 </template>
               </template>
               <template v-else>
-                <div class="flex justify-between">
-                  <strong>{{ key }}:</strong> {{ val }}
+                <div class="flex justify-between text-right">
+                  <strong class="text-left">{{ key }}:</strong> {{ val }}
                 </div>
               </template>
             </li>
