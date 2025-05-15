@@ -49,7 +49,8 @@ const emit = defineEmits([
           :disabled="item.disabled"
           :class="{ 'opacity-50': item.disabled }"
         >
-          {{ item.name }} — {{ item.price }}₽
+          {{ item.name
+          }}<!-- — {{ item.price }}₽ -->
         </option>
       </select>
     </label>

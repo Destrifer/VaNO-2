@@ -90,38 +90,55 @@ const cartTotal = computed(() => {
             <li v-for="(val, key) in item.options" :key="key">
               <template v-if="key.toLowerCase() === 'тираж'">
                 <template v-if="Array.isArray(val)">
-                  <strong>Тираж:</strong>
-                  {{ val.reduce((sum, qty) => sum + qty, 0) }} шт.
+                  <div class="flex justify-between">
+                    <strong>Тираж:</strong>
+                    {{ val.reduce((sum, qty) => sum + qty, 0) }} шт
+                  </div>
                   <ul class="pl-4 list-disc">
                     <li v-for="(qty, i) in val" :key="i">
-                      Вид {{ i + 1 }}: {{ qty }} шт.
+                      Вид {{ i + 1 }}: {{ qty }} шт
                     </li>
                   </ul>
                 </template>
                 <template v-else>
-                  <strong>Тираж:</strong> {{ val }} шт.
+                  <div class="flex justify-between">
+                    <strong>Тираж:</strong> {{ val }} шт
+                  </div>
                 </template>
               </template>
-              <template v-else> {{ key }}: {{ val }} </template>
+              <template v-else>
+                <div class="flex justify-between">
+                  <strong>{{ key }}:</strong> {{ val }}
+                </div>
+              </template>
             </li>
           </ul>
 
-          <div>
+          <div class="flex justify-between">
             Базовая цена: <strong>{{ item.price }} ₽</strong>
           </div>
 
           <div class="space-y-1">
-            <label class="flex items-center gap-2">
-              <input type="checkbox" v-model="item.simpleDesign" />
-              Простой дизайн (+900 ₽)
+            <label class="flex items-center gap-2 justify-between">
+              <span
+                ><input type="checkbox" v-model="item.simpleDesign" /> Простой
+                дизайн</span
+              >
+              +900 ₽
             </label>
-            <label class="flex items-center gap-2">
-              <input type="checkbox" v-model="item.photoRedraw" />
-              Отрисовка по фото (+500 ₽)
+            <label class="flex items-center gap-2 justify-between">
+              <span>
+                <input type="checkbox" v-model="item.photoRedraw" />
+                Отрисовка по фото</span
+              >
+              +500 ₽
             </label>
           </div>
 
-          <div>
+          <div class="space-y-2">
+            <label class="block text-sm text-gray-600 font-medium">
+              Выберите файлы макета:
+            </label>
             <input
               type="file"
               multiple

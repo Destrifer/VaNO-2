@@ -164,11 +164,11 @@ const handleOrder = () => {
     title: "Наклейки",
     icon: productInfo?.icon || "/icons/default.svg",
     options: {
-      тираж: viewOptions,
-      диаметр: `${diameter.value} мм`,
-      материал: materialKey.value,
-      ламинация: useLamination.value ? laminationKey.value : "без ламинации",
-      фольгирование: useFoil.value ? `Да, цвет: ${foilColor.value}` : "Нет",
+      Тираж: viewOptions,
+      Диаметр: `${diameter.value} мм`,
+      Материал: materialKey.value,
+      Ламинация: useLamination.value ? laminationKey.value : "без ламинации",
+      Фольгирование: useFoil.value ? `Да, цвет: ${foilColor.value}` : "Нет",
     },
     price: result.value.total,
   });
