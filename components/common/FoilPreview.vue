@@ -9,6 +9,7 @@ const props = defineProps({
 const emit = defineEmits(["update:foilColor"]);
 
 const foilColors = settings.foil_colors;
+
 const previewingColor = ref(null);
 
 const selectColor = (color) => {
@@ -21,7 +22,7 @@ const selectColor = (color) => {
   <div class="space-y-4">
     <h3 class="text-sm font-semibold text-gray-800">Цвет фольги</h3>
 
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 relative">
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
       <div
         v-for="(img, color) in foilColors"
         :key="color"
@@ -33,20 +34,17 @@ const selectColor = (color) => {
         "
         @click="selectColor(color)"
       >
-        <!-- Тултип (мобильный: по центру экрана; десктоп: над иконкой) -->
+        <!-- Тултип сверху -->
         <div
           v-if="previewingColor === color"
-          class="absolute z-30 bottom-full mb-3 w-max max-w-[90vw]"
-          :class="[
-            'sm:left-1/2 sm:-translate-x-1/2', // на десктопе — по центру элемента
-            'left-1/2 -translate-x-1/2', // на мобилках — по центру экрана
-          ]"
+          class="absolute z-30 left-1/2 -translate-x-1/2 bottom-full mb-3"
         >
           <div
-            class="relative bg-white border rounded shadow-xl p-2 w-[280px] sm:w-[360px]"
+            class="relative bg-white border rounded shadow-xl p-2 w-[200px] sm:w-[400px]"
           >
+            <!-- Кнопка закрытия -->
             <button
-              class="absolute top-1 right-1 text-lg text-gray-500 hover:text-red-500"
+              class="absolute top-0 right-2 text-4xl text-white hover:text-black hover:cursor-pointer"
               @click.stop="previewingColor = null"
               aria-label="Закрыть предпросмотр"
             >
@@ -55,8 +53,8 @@ const selectColor = (color) => {
             <NuxtImg
               :src="img"
               alt="Предпросмотр фольги"
-              width="360"
-              height="360"
+              width="400"
+              height="400"
               format="avif,webp,jpg"
               class="rounded object-cover w-full h-auto"
             />
