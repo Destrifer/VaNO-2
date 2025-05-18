@@ -58,7 +58,7 @@
           <form method="dialog" class="dialog-inner">
             <button class="close-button">×</button>
             <video controls width="100%">
-              <source src="/videos/way.mp4" type="video/mp4" />
+              <source src="/videos/Ае.mp4" type="video/mp4" />
               Ваш браузер не поддерживает видео.
             </video>
           </form>
