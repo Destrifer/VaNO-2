@@ -74,7 +74,7 @@ const cartTotal = computed(() => {
         </button>
 
         <!-- Иконка -->
-        <div class="w-32 h-32 flex-shrink-0">
+        <div class="self-start">
           <img
             :src="item.icon || '/icons/default.svg'"
             alt="Иконка"

@@ -212,13 +212,13 @@ const submitOrder = async () => {
 
     <div class="mt-4 space-y-2">
       <h3 class="font-semibold">Доставка</h3>
-      <label class="flex items-center gap-2">
+      <label class="flex-inline items-center gap-2">
         <input type="radio" value="pickup" v-model="delivery" /> Самовывоз из
         нашего <NuxtLink to="#">офиса</NuxtLink> на
         <Icon
           name="simple-icons:moscowmetro"
           size="20"
-          class="text-[#d4212d] -mr-1"
+          class="text-[#d4212d] mr-1"
         />Нагатинская.
       </label>
       <label class="flex items-center gap-2">
