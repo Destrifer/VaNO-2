@@ -1,6 +1,8 @@
 <script setup>
 const props = defineProps({
   diameter: Number,
+  width: Number,
+  height: Number,
   material: String,
   lamination: String,
   useLamination: Boolean,
@@ -8,31 +10,73 @@ const props = defineProps({
   foilColor: String,
   materials: Array, // [{ name, price, disabled }]
   laminations: Object, // { key: price }
+  printMode: String,
 });
 
 const emit = defineEmits([
   "update:diameter",
+  "update:width",
+  "update:height",
   "update:material",
   "update:lamination",
   "update:useLamination",
   "update:useFoil",
   "update:foilColor",
+  "update:printMode",
 ]);
 </script>
 
 <template>
   <div class="space-y-4">
-    <!-- Диаметр -->
-    <label class="block">
-      Диаметр (мм):
-      <input
-        type="number"
-        min="1"
-        class="mt-1 border px-2 py-1 w-full"
-        :value="diameter"
-        @input="emit('update:diameter', +$event.target.value)"
-      />
-    </label>
+    <!-- Размер изделия -->
+    <template v-if="diameter !== undefined">
+      <label class="block">
+        Диаметр (мм):
+        <input
+          type="number"
+          min="1"
+          class="mt-1 border px-2 py-1 w-full"
+          :value="diameter"
+          @input="emit('update:diameter', +$event.target.value)"
+        />
+      </label>
+    </template>
+
+    <template v-else>
+      <label class="block">
+        Ширина (мм):
+        <input
+          type="number"
+          min="1"
+          class="mt-1 border px-2 py-1 w-full"
+          :value="width"
+          @input="emit('update:width', +$event.target.value)"
+        />
+      </label>
+
+      <label class="block">
+        Высота (мм):
+        <input
+          type="number"
+          min="1"
+          class="mt-1 border px-2 py-1 w-full"
+          :value="height"
+          @input="emit('update:height', +$event.target.value)"
+        />
+      </label>
+
+      <label class="block">
+        Печать:
+        <select
+          class="mt-1 border px-2 py-1 w-full"
+          :value="printMode"
+          @change="emit('update:printMode', $event.target.value)"
+        >
+          <option value="4+0">4+0</option>
+          <option value="4+4">4+4</option>
+        </select>
+      </label>
+    </template>
 
     <!-- Материал -->
     <label class="block">
@@ -49,8 +93,8 @@ const emit = defineEmits([
           :disabled="item.disabled"
           :class="{ 'opacity-50': item.disabled }"
         >
-          {{ item.name
-          }}<!-- — {{ item.price }}₽ -->
+          {{ item.name }}
+          <!-- — {{ item.price }}₽ -->
         </option>
       </select>
     </label>

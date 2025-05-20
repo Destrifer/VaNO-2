@@ -1,0 +1,110 @@
+{
+  "materials": {
+    "Офсетная 80 гр.": 3,
+    "Мелованная матовая 135 гр.": 9,
+    "Мелованная матовая 150 гр.": 11,
+    "Мелованная матовая 170 гр.": 12,
+    "Мелованная матовая 200 гр.": 14,
+    "Мелованная матовая 250 гр.": 17,
+    "Мелованная матовая 300 гр.": 25,
+    "Картон 2х сторнний 300 гр.": 35
+  },
+  "lamination": {
+    "Матовая 30 мкм": 30,
+    "Глянцевая 30 мкм": 30,
+    "Матовая 75 мкм": 80,
+    "Глянцевая 75 мкм": 80,
+    "Матовая 125 мкм": 130,
+    "Глянцевая 125 мкм": 130,
+    "Матовая 250 мкм": 200,
+    "Глянцевая 250 мкм": 200,
+    "Soft touch": 110,
+    "Ultra Bond глянец": 55,
+    "Ultra Bond матовая": 55
+  },
+  "lamination_setup_cost": 300,
+  "print_price": {
+    "4+0": [
+      { "to": 10, "price": 80 },
+      { "to": 50, "price": 60 },
+      { "to": 100, "price": 55 },
+      { "to": 200, "price": 50 },
+      { "to": 300, "price": 47 },
+      { "to": 400, "price": 45 },
+      { "to": 500, "price": 42 },
+      { "to": 750, "price": 40 },
+      { "to": 1000, "price": 37 },
+      { "to": 2000, "price": 35 },
+      { "to": 4000, "price": 32 },
+      { "to": 999999, "price": 30 }
+    ],
+    "4+4": [
+      { "to": 10, "price": 120 },
+      { "to": 50, "price": 100 },
+      { "to": 100, "price": 90 },
+      { "to": 200, "price": 85 },
+      { "to": 300, "price": 80 },
+      { "to": 400, "price": 75 },
+      { "to": 500, "price": 70 },
+      { "to": 750, "price": 65 },
+      { "to": 1000, "price": 60 },
+      { "to": 2000, "price": 55 },
+      { "to": 4000, "price": 50 },
+      { "to": 999999, "price": 45 }
+    ]
+  },
+  "foil_price": [
+    { "to": 10, "price": 400 },
+    { "to": 30, "price": 350 },
+    { "to": 50, "price": 300 },
+    { "to": 100, "price": 250 },
+    { "to": 200, "price": 170 },
+    { "to": 300, "price": 150 },
+    { "to": 500, "price": 135 },
+    { "to": 999999, "price": 120 }
+  ],
+  "foil_colors": {
+    "серебро": "/images/foil/silver.png",
+    "золото": "/images/foil/gold.png",
+    "синий": "/images/foil/blue.png",
+    "красный": "/images/foil/red.png",
+    "зеленый": "/images/foil/green.png",
+    "бронза": "/images/foil/bronze.png"
+  },
+  "sheet": {
+    "width": 438,
+    "height": 309,
+    "margin": 4
+  },
+  "options": {
+    "bending": {
+      "enabled": true,
+      "base": 300,
+      "per_fold": 4
+    },
+    "round_corners": {
+      "enabled": true,
+      "base": 300,
+      "per_corner": 1
+    },
+    "pikallo": {
+      "enabled": true,
+      "base": 300,
+      "per_item": 3
+    },
+    "drilling": {
+      "enabled": true,
+      "base": 500,
+      "per_hole": 1
+    },
+    "euro_slot": {
+      "enabled": false,
+      "per_item": 15
+    },
+    "glue_dot": {
+      "enabled": false,
+      "per_item": 15
+    }
+  },
+  "cutting_percentage": 15
+}
