@@ -22,6 +22,12 @@
         @update:printMode="(val) => (printMode = val)"
       />
 
+      <FoilPreview
+        v-if="useFoil"
+        :foilColor="foilColor"
+        @update:foilColor="(val) => (foilColor = val)"
+      />
+
       <div class="space-y-2">
         <label class="flex items-center gap-2">
           <input type="checkbox" v-model="useBending" />
@@ -53,14 +59,13 @@
           />
         </div>
 
-        <label class="flex items-center gap-2">
-          <input type="radio" v-model="drillType" value="pikallo" />
-          Установка пиккало
-        </label>
-
-        <label class="flex items-center gap-2">
-          <input type="radio" v-model="drillType" value="drilling" />
-          Сверление
+        <label class="block">
+          Пиккало / Сверление:
+          <select v-model="drillType" class="mt-1 border px-2 py-1 w-full">
+            <option :value="null">Не выбрано</option>
+            <option value="pikallo">Установка пиккало</option>
+            <option value="drilling">Сверление</option>
+          </select>
         </label>
         <div v-if="drillType === 'drilling'" class="ml-4">
           Кол-во отверстий:
@@ -73,12 +78,6 @@
           />
         </div>
       </div>
-
-      <FoilPreview
-        v-if="useFoil"
-        :foilColor="foilColor"
-        @update:foilColor="(val) => (foilColor = val)"
-      />
 
       <div v-if="correctionMessage" class="text-orange-600 italic text-sm">
         {{ correctionMessage }}
@@ -192,21 +191,25 @@ const result = computed(() => {
   const sheetsNeeded = Math.ceil(totalTirazh.value / itemsPerSheet);
 
   const material = settings.materials[materialKey.value];
-  const lamination = useLamination.value
-    ? settings.lamination[laminationKey.value] + settings.lamination_setup_cost
+  const laminationPerSheet = useLamination.value
+    ? settings.lamination[laminationKey.value]
+    : 0;
+  const laminationSetup = useLamination.value
+    ? settings.lamination_setup_cost
     : 0;
   const foil = useFoil.value ? getTierPrice(foilPrices, sheetsNeeded) : 0;
 
   const unitPrice =
     getTierPrice(printPrices[printMode.value], sheetsNeeded) +
     material +
-    lamination;
+    laminationPerSheet;
 
   const subtotal = sheetsNeeded * unitPrice;
   const foilTotal = foil * sheetsNeeded;
   const cutting = (subtotal + foilTotal) * (settings.cutting_percentage / 100);
 
-  let extras = 0;
+  let extras = laminationSetup;
+
   if (useBending.value) {
     extras += 300 + 4 * totalTirazh.value * Math.min(bendingFolds.value, 2);
   }
@@ -253,8 +256,66 @@ const materialsWithStatus = computed(() =>
 );
 
 const betterDeals = computed(() => {
-  // ... (оставим как есть)
-  return [];
+  const sizeWithMarginX = Number(width.value) + sheet.margin * 2;
+  const sizeWithMarginY = Number(height.value) + sheet.margin * 2;
+  const sizeWithMarginAltX = Number(height.value) + sheet.margin * 2;
+  const sizeWithMarginAltY = Number(width.value) + sheet.margin * 2;
+
+  const fitNormal =
+    Math.floor(sheet.width / sizeWithMarginX) *
+    Math.floor(sheet.height / sizeWithMarginY);
+  const fitRotated =
+    Math.floor(sheet.width / sizeWithMarginAltX) *
+    Math.floor(sheet.height / sizeWithMarginAltY);
+  const itemsPerSheet = Math.max(fitNormal, fitRotated);
+
+  if (!itemsPerSheet || itemsPerSheet === 0) return [];
+
+  const currentSheets = Math.ceil(totalTirazh.value / itemsPerSheet);
+  const currentPricePerSheet = getTierPrice(
+    printPrices[printMode.value],
+    currentSheets
+  );
+
+  const deals = [];
+  let foundDeals = 0;
+
+  for (const tier of printPrices[printMode.value]) {
+    if (tier.to <= currentSheets) continue;
+    if (foundDeals >= 4) break;
+
+    const neededSheets = tier.to;
+    const neededTirazh = neededSheets * itemsPerSheet;
+
+    const printCost = getTierPrice(printPrices[printMode.value], neededSheets);
+    const materialCost = settings.materials[materialKey.value];
+    const laminationCost = useLamination.value
+      ? settings.lamination[laminationKey.value]
+      : 0;
+    const foilCost = useFoil.value ? getTierPrice(foilPrices, neededSheets) : 0;
+
+    const totalCost =
+      (printCost + materialCost + laminationCost + foilCost) * neededSheets;
+    const fullUnitPrice = (totalCost / neededTirazh).toFixed(2);
+
+    const currentTotalCost =
+      (currentPricePerSheet + materialCost + laminationCost + foilCost) *
+      currentSheets;
+    const currentUnitPrice = currentTotalCost / totalTirazh.value;
+
+    const saving = 100 - (totalCost / neededTirazh / currentUnitPrice) * 100;
+
+    if (saving > 0) {
+      deals.push({
+        neededTirazh,
+        saving: saving.toFixed(1),
+        fullUnitPrice,
+      });
+      foundDeals++;
+    }
+  }
+
+  return deals;
 });
 
 const applyDeal = (deal) => {
