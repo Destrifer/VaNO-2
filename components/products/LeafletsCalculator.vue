@@ -94,16 +94,75 @@
     <div class="space-y-6">
       <div class="border-t pt-6">
         <h2 class="text-xl font-semibold mb-2">Итог заказа:</h2>
-        <ul class="space-y-1">
+        <ul class="space-y-1 text-sm">
           <li>
             Изделий на листе: <strong>{{ result.itemsPerSheet }}</strong>
           </li>
           <li>
             Листов нужно: <strong>{{ result.sheetsNeeded }}</strong>
           </li>
+          <li>
+            Цена за печать ({{
+              getTierPrice(printPrices[printMode], result.sheetsNeeded)
+            }}
+            ₽/лист):
+            <strong
+              >{{
+                (
+                  getTierPrice(printPrices[printMode], result.sheetsNeeded) *
+                  result.sheetsNeeded
+                ).toFixed(2)
+              }}
+              ₽</strong
+            >
+          </li>
+          <li>
+            Цена за материал ({{ settings.materials[materialKey] }} ₽/лист):
+            <strong
+              >{{
+                (settings.materials[materialKey] * result.sheetsNeeded).toFixed(
+                  2
+                )
+              }}
+              ₽</strong
+            >
+          </li>
+          <li v-if="useLamination">
+            Ламинация ({{ settings.lamination[laminationKey] }} ₽/лист +
+            {{ settings.lamination_setup_cost }} ₽ приладка):
+            <strong
+              >{{
+                (
+                  settings.lamination[laminationKey] * result.sheetsNeeded +
+                  settings.lamination_setup_cost
+                ).toFixed(2)
+              }}
+              ₽</strong
+            >
+          </li>
+          <li v-if="useFoil">
+            Фольгирование ({{
+              getTierPrice(foilPrices, result.sheetsNeeded)
+            }}
+            ₽/лист):
+            <strong
+              >{{
+                (
+                  getTierPrice(foilPrices, result.sheetsNeeded) *
+                  result.sheetsNeeded
+                ).toFixed(2)
+              }}
+              ₽</strong
+            >
+          </li>
+          <li>
+            Резка ({{ settings.cutting_percentage }}% от печати + материала +
+            ламинации + фольги):
+            <strong>{{ result.cutting.toFixed(2) }} ₽</strong>
+          </li>
           <li class="text-lg font-bold mt-2">
             Общая сумма:
-            <span class="text-green-600">{{ result.total }} ₽</span>
+            <span class="text-green-600">{{ result.total.toFixed(2) }} ₽</span>
           </li>
           <li>
             Цена за штуку:
@@ -141,11 +200,11 @@ const foilPrices = settings.foil_price;
 const sheet = settings.sheet;
 
 const views = ref([{ qty: 500 }]);
-const width = ref(100);
-const height = ref(210);
+const width = ref(98);
+const height = ref(200);
 const printMode = ref("4+0");
 const materialKey = ref(Object.keys(settings.materials)[0]);
-const laminationKey = ref("Soft touch");
+const laminationKey = ref("Глянцевая 30 мкм");
 const useLamination = ref(true);
 const useFoil = ref(false);
 const foilColor = ref("серебро");
@@ -206,7 +265,9 @@ const result = computed(() => {
 
   const subtotal = sheetsNeeded * unitPrice;
   const foilTotal = foil * sheetsNeeded;
-  const cutting = (subtotal + foilTotal) * (settings.cutting_percentage / 100);
+  const cutting =
+    (subtotal + foilTotal + laminationSetup) *
+    (settings.cutting_percentage / 100);
 
   let extras = laminationSetup;
 
