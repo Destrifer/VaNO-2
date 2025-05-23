@@ -2,7 +2,7 @@
   <div class="mx-auto p-6 grid grid-cols-1 md:grid-cols-3 gap-8">
     <!-- Левая колонка -->
     <div class="space-y-6">
-      <h1 class="text-2xl font-bold">Лифлеты</h1>
+      <h1 class="text-2xl font-bold">Калькулятор листовок</h1>
 
       <ProductViews v-model="views" />
 
@@ -141,7 +141,9 @@
             >
           </li>
           <li v-if="useFoil">
-            Фольгирование ({{ getTierPrice(foilPrices, result.sheetsNeeded) }}
+            Фольгирование ({{
+              getTierPrice(foilPrices, result.sheetsNeeded)
+            }}
             ₽/лист):
             <strong
               >{{
