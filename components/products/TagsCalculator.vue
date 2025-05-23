@@ -197,13 +197,13 @@ const printPrices = settings.print_price;
 const foilPrices = settings.foil_price;
 const sheet = settings.sheet;
 
-const views = ref([{ qty: 500 }]);
-const width = ref(98);
-const height = ref(200);
+const views = ref([{ qty: 100 }]);
+const width = ref(40);
+const height = ref(60);
 const printMode = ref("4+0");
-const materialKey = ref(Object.keys(settings.materials)[0]);
-const laminationKey = ref("Глянцевая 30 мкм");
-const useLamination = ref(true);
+const materialKey = ref(Object.keys(settings.materials)[6]);
+const laminationKey = ref("Мелованная матовая 300 гр.");
+const useLamination = ref(false);
 const useFoil = ref(false);
 const foilColor = ref("серебро");
 
