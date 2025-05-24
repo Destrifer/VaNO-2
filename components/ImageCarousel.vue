@@ -27,7 +27,11 @@ onMounted(async () => {
 <template>
   <div ref="emblaRef" class="overflow-hidden">
     <div class="flex">
-      <div v-for="img in images" :key="img" class="flex-[0_0_100%] px-2">
+      <div
+        v-for="img in images"
+        :key="img"
+        class="basis-1/2 sm:basis-1/3 lg:basis-1/4 shrink-0 px-2"
+      >
         <NuxtImg
           :src="img"
           format="webp"
