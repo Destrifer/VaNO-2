@@ -1,4 +1,6 @@
 <script setup>
+import { ref, watch } from "vue";
+
 const props = defineProps({
   diameter: Number,
   width: Number,
@@ -8,8 +10,8 @@ const props = defineProps({
   useLamination: Boolean,
   useFoil: Boolean,
   foilColor: String,
-  materials: Array, // [{ name, price, disabled }]
-  laminations: Object, // { key: price }
+  materials: Array,
+  laminations: Object,
   printMode: String,
 });
 
@@ -24,6 +26,51 @@ const emit = defineEmits([
   "update:foilColor",
   "update:printMode",
 ]);
+
+// 🔁 Проксированные v-model поля
+const materialProxy = ref(props.material);
+const laminationProxy = ref(props.lamination);
+const printModeProxy = ref(props.printMode);
+const useLaminationProxy = ref(props.useLamination);
+const useFoilProxy = ref(props.useFoil);
+const foilColorProxy = ref(props.foilColor);
+
+// 🔁 Слежение и синхронизация с emit
+watch(materialProxy, (val) => emit("update:material", val));
+watch(
+  () => props.material,
+  (val) => (materialProxy.value = val)
+);
+
+watch(laminationProxy, (val) => emit("update:lamination", val));
+watch(
+  () => props.lamination,
+  (val) => (laminationProxy.value = val)
+);
+
+watch(printModeProxy, (val) => emit("update:printMode", val));
+watch(
+  () => props.printMode,
+  (val) => (printModeProxy.value = val)
+);
+
+watch(useLaminationProxy, (val) => emit("update:useLamination", val));
+watch(
+  () => props.useLamination,
+  (val) => (useLaminationProxy.value = val)
+);
+
+watch(useFoilProxy, (val) => emit("update:useFoil", val));
+watch(
+  () => props.useFoil,
+  (val) => (useFoilProxy.value = val)
+);
+
+watch(foilColorProxy, (val) => emit("update:foilColor", val));
+watch(
+  () => props.foilColor,
+  (val) => (foilColorProxy.value = val)
+);
 </script>
 
 <template>
@@ -67,11 +114,7 @@ const emit = defineEmits([
 
       <label class="block">
         Печать:
-        <select
-          class="mt-1 border px-2 py-1 w-full"
-          :value="printMode"
-          @change="emit('update:printMode', $event.target.value)"
-        >
+        <select class="mt-1 border px-2 py-1 w-full" v-model="printModeProxy">
           <option value="4+0">4+0</option>
           <option value="4+4">4+4</option>
         </select>
@@ -81,20 +124,14 @@ const emit = defineEmits([
     <!-- Материал -->
     <label class="block">
       Материал:
-      <select
-        class="mt-1 border px-2 py-1 w-full"
-        :value="material"
-        @change="emit('update:material', $event.target.value)"
-      >
+      <select class="mt-1 border px-2 py-1 w-full" v-model="materialProxy">
         <option
           v-for="item in materials"
           :key="item.name"
           :value="item.name"
           :disabled="item.disabled"
-          :class="{ 'opacity-50': item.disabled }"
         >
           {{ item.name }}
-          <!-- — {{ item.price }}₽ -->
         </option>
       </select>
     </label>
@@ -104,21 +141,19 @@ const emit = defineEmits([
       <label class="flex items-center gap-2 mb-1">
         <input
           type="checkbox"
-          :checked="useLamination"
-          @change="emit('update:useLamination', $event.target.checked)"
-          :disabled="useFoil"
+          v-model="useLaminationProxy"
+          :disabled="useFoilProxy"
         />
         Добавить ламинацию
       </label>
 
-      <div v-if="useLamination">
+      <div v-if="useLaminationProxy">
         <label class="block">
           Тип ламинации:
           <select
             class="mt-1 border px-2 py-1 w-full"
-            :value="lamination"
-            @change="emit('update:lamination', $event.target.value)"
-            :disabled="useFoil"
+            v-model="laminationProxy"
+            :disabled="useFoilProxy"
           >
             <option v-for="(price, key) in laminations" :key="key" :value="key">
               {{ key }} — {{ price }}₽
@@ -131,11 +166,7 @@ const emit = defineEmits([
     <!-- Фольгирование -->
     <div class="block">
       <label class="flex items-center gap-2">
-        <input
-          type="checkbox"
-          :checked="useFoil"
-          @change="emit('update:useFoil', $event.target.checked)"
-        />
+        <input type="checkbox" v-model="useFoilProxy" />
         Добавить фольгирование
       </label>
     </div>

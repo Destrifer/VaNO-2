@@ -2,7 +2,7 @@
   <div class="mx-auto p-6 grid grid-cols-1 md:grid-cols-3 gap-8">
     <!-- Левая колонка -->
     <div class="space-y-6">
-      <h1 class="text-2xl font-bold">Калькулятор листовок</h1>
+      <h1 class="text-2xl font-bold">Калькулятор {{ title.toLowerCase() }}</h1>
 
       <ProductViews v-model="views" />
 
@@ -29,54 +29,64 @@
       />
 
       <div class="space-y-2">
-        <label class="flex items-center gap-2">
-          <input type="checkbox" v-model="useBending" />
-          Биговка
-        </label>
-        <div v-if="useBending" class="ml-4">
-          Кол-во фальцев:
-          <input
-            type="number"
-            min="1"
-            max="2"
-            v-model.number="bendingFolds"
-            class="border px-2 py-1 w-20"
-          />
-        </div>
+        <template v-if="enabledOptions.bending">
+          <label class="flex items-center gap-2">
+            <input type="checkbox" v-model="useBending" />
+            Биговка
+          </label>
+          <div v-if="useBending" class="ml-4">
+            Кол-во фальцев:
+            <input
+              type="number"
+              min="1"
+              max="2"
+              v-model.number="bendingFolds"
+              class="border px-2 py-1 w-20"
+            />
+          </div>
+        </template>
 
-        <label class="flex items-center gap-2">
-          <input type="checkbox" v-model="useRoundCorners" />
-          Скругление уголков
-        </label>
-        <div v-if="useRoundCorners" class="ml-4">
-          Кол-во углов:
-          <input
-            type="number"
-            min="1"
-            max="4"
-            v-model.number="cornerCount"
-            class="border px-2 py-1 w-20"
-          />
-        </div>
+        <template v-if="enabledOptions.round_corners">
+          <label class="flex items-center gap-2">
+            <input type="checkbox" v-model="useRoundCorners" />
+            Скругление уголков
+          </label>
+          <div v-if="useRoundCorners" class="ml-4">
+            Кол-во углов:
+            <input
+              type="number"
+              min="1"
+              max="4"
+              v-model.number="cornerCount"
+              class="border px-2 py-1 w-20"
+            />
+          </div>
+        </template>
 
-        <label class="block">
-          Пиккало / Сверление:
-          <select v-model="drillType" class="mt-1 border px-2 py-1 w-full">
-            <option :value="null">Не выбрано</option>
-            <option value="pikallo">Установка пиккало</option>
-            <option value="drilling">Сверление</option>
-          </select>
-        </label>
-        <div v-if="drillType === 'drilling'" class="ml-4">
-          Кол-во отверстий:
-          <input
-            type="number"
-            min="1"
-            max="4"
-            v-model.number="holeCount"
-            class="border px-2 py-1 w-20"
-          />
-        </div>
+        <template v-if="enabledOptions.pikallo || enabledOptions.drilling">
+          <label class="block">
+            Пиккало / Сверление:
+            <select v-model="drillType" class="mt-1 border px-2 py-1 w-full">
+              <option :value="null">Не выбрано</option>
+              <option v-if="enabledOptions.pikallo" value="pikallo">
+                Установка пиккало
+              </option>
+              <option v-if="enabledOptions.drilling" value="drilling">
+                Сверление
+              </option>
+            </select>
+          </label>
+          <div v-if="drillType === 'drilling'" class="ml-4">
+            Кол-во отверстий:
+            <input
+              type="number"
+              min="1"
+              max="4"
+              v-model.number="holeCount"
+              class="border px-2 py-1 w-20"
+            />
+          </div>
+        </template>
       </div>
 
       <div v-if="correctionMessage" class="text-orange-600 italic text-sm">
@@ -86,7 +96,7 @@
 
     <!-- Центральная колонка -->
     <div class="flex flex-col items-center space-y-6">
-      <LeafletsPreview :width="width" :height="height" />
+      <component :is="previewComponent" :width="width" :height="height" />
       <BetterDeals :better-deals="betterDeals" @select-deal="applyDeal" />
     </div>
 
@@ -96,28 +106,68 @@
         <h2 class="text-xl font-semibold mb-2">Итог заказа:</h2>
         <ul class="space-y-1 text-sm">
           <li>
+            Тираж: <strong>{{ totalTirazh }}</strong>
+          </li>
+          <li>
             Изделий на листе: <strong>{{ result.itemsPerSheet }}</strong>
           </li>
           <li>
             Листов нужно: <strong>{{ result.sheetsNeeded }}</strong>
           </li>
+
+          <li class="mt-2 font-semibold">Стоимость по шагам:</li>
+
           <li>
-            Печать + Материал + Ламинация:
-            <strong>{{ result.subtotal.toFixed(2) }} ₽</strong>
+            Печать ({{ printMode }}) × {{ result.sheetsNeeded }} листов:
+            <strong>
+              {{
+                (settings.print_price[printMode].find(
+                  (t) => result.sheetsNeeded <= t.to
+                )?.price ?? settings.print_price[printMode].at(-1)?.price) *
+                result.sheetsNeeded
+              }}
+              ₽
+            </strong>
           </li>
+
+          <li>
+            Материал ({{ materialKey }}) × {{ result.sheetsNeeded }}:
+            <strong>
+              {{ settings.materials[materialKey] * result.sheetsNeeded }} ₽
+            </strong>
+          </li>
+
+          <li v-if="useLamination">
+            Ламинация ({{ laminationKey }}) × {{ result.sheetsNeeded }}:
+            <strong>
+              {{ settings.lamination[laminationKey] * result.sheetsNeeded }} ₽
+            </strong>
+          </li>
+          <li v-if="useLamination">
+            Приладка ламинации:
+            <strong>{{ settings.lamination_setup_cost }} ₽</strong>
+          </li>
+
           <li v-if="useFoil">
-            Фольгирование: <strong>{{ result.foilTotal.toFixed(2) }} ₽</strong>
+            Фольгирование × {{ result.sheetsNeeded }}:
+            <strong>{{ result.foilTotal.toFixed(2) }} ₽</strong>
           </li>
-          <li>
-            Резка: <strong>{{ result.cutting.toFixed(2) }} ₽</strong>
-          </li>
+
           <li v-if="result.extras > 0">
-            Дополнительно: <strong>{{ result.extras.toFixed(2) }} ₽</strong>
+            Доп. опции:
+            <strong>{{ result.extras.toFixed(2) }} ₽</strong>
           </li>
-          <li class="text-lg font-bold mt-2">
+
+          <li>
+            Резка ({{ settings.cutting_percentage }}%):
+            <strong>{{ result.cutting.toFixed(2) }} ₽</strong>
+          </li>
+
+          <li class="text-lg font-bold mt-3">
             Общая сумма:
             <span class="text-green-600">{{ result.total.toFixed(2) }} ₽</span>
           </li>
+
           <li>
             Цена за штуку:
             <strong class="text-blue-600">
@@ -139,26 +189,32 @@
 
 <script setup>
 import { ref, computed, watch } from "vue";
+import { useProductCalculator } from "~/composables/useProductCalculator";
 import { useAddToCart } from "~/composables/useAddToCart";
 import settings from "~/assets/settings_print.json";
-import { useProductCalculator } from "~/composables/useProductCalculator";
-import { products } from "~/assets/products.js";
 
 import ProductViews from "@/components/common/ProductViews.vue";
 import ProductOptions from "@/components/common/ProductOptions.vue";
 import FoilPreview from "@/components/common/FoilPreview.vue";
 import BetterDeals from "@/components/common/BetterDeals.vue";
-import LeafletsPreview from "@/components/products/LeafletsPreview.vue";
 
-const views = ref([{ qty: 500 }]);
-const width = ref(98);
-const height = ref(200);
-const printMode = ref("4+0");
-const materialKey = ref(Object.keys(settings.materials)[0]);
-const laminationKey = ref("Глянцевая 30 мкм");
-const useLamination = ref(true);
-const useFoil = ref(false);
-const foilColor = ref("серебро");
+const props = defineProps({
+  title: String,
+  icon: String,
+  defaultValues: Object,
+  enabledOptions: Object,
+  previewComponent: [Object, Function],
+});
+
+const views = ref(props.defaultValues.views || [{ qty: 500 }]);
+const width = ref(props.defaultValues.width);
+const height = ref(props.defaultValues.height);
+const printMode = ref(props.defaultValues.printMode);
+const materialKey = ref(props.defaultValues.materialKey);
+const laminationKey = ref(props.defaultValues.laminationKey);
+const useLamination = ref(props.defaultValues.useLamination);
+const useFoil = ref(props.defaultValues.useFoil);
+const foilColor = ref(props.defaultValues.foilColor);
 
 const useBending = ref(false);
 const bendingFolds = ref(1);
@@ -168,7 +224,6 @@ const drillType = ref(null);
 const holeCount = ref(1);
 
 const savedMaterial = ref("");
-savedMaterial.value = materialKey.value;
 const savedLamination = ref("");
 const correctionMessage = ref("");
 
@@ -196,12 +251,7 @@ const result = computed(() =>
     cornerCount: cornerCount.value,
     drillType: drillType.value,
     holeCount: holeCount.value,
-    enabledOptions: {
-      bending: true,
-      round_corners: true,
-      pikallo: true,
-      drilling: true,
-    },
+    enabledOptions: props.enabledOptions,
   })
 );
 
@@ -304,17 +354,11 @@ const applyDeal = (deal) => {
 };
 
 const handleOrder = () => {
-  const productInfo = products.find((p) => p.title === "Листовки");
-  const viewOptions =
-    views.value.length === 1
-      ? totalTirazh.value
-      : views.value.map((view) => view.qty);
-
   addProduct({
-    title: "Листовки",
-    icon: productInfo?.icon || "/icons/default.svg",
+    title: props.title,
+    icon: props.icon || "/icons/default.svg",
     options: {
-      Тираж: viewOptions,
+      Тираж: views.value.map((view) => view.qty),
       Размер: `${width.value}×${height.value} мм`,
       Печать: printMode.value,
       Материал: materialKey.value,
