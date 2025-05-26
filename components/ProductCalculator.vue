@@ -20,6 +20,7 @@
         @update:height="(val) => (height = val)"
         :printMode="printMode"
         @update:printMode="(val) => (printMode = val)"
+        :enabledOptions="enabledOptions"
       />
 
       <FoilPreview

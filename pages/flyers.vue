@@ -1,6 +1,6 @@
 <script setup>
 import ProductCalculator from "@/components/ProductCalculator.vue";
-import LeafletsPreview from "@/components/products/LeafletsPreview.vue"; // импортируем здесь
+import LeafletsPreview from "@/components/products/LeafletsPreview.vue";
 
 const defaultValues = {
   width: 148,
@@ -19,6 +19,8 @@ const enabledOptions = {
   round_corners: false,
   pikallo: false,
   drilling: false,
+  lamination: true,
+  foil: true,
 };
 </script>
 
