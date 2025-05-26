@@ -1,7 +1,9 @@
 <script setup>
 import ProductCalculator from "@/components/ProductCalculator.vue";
 import LeafletsPreview from "@/components/products/LeafletsPreview.vue";
+import settings from "@/assets/settings_print.json"; // для доступа к размерам (если нужно)
 
+// Значения по умолчанию
 const defaultValues = {
   width: 148,
   height: 210,
@@ -14,6 +16,7 @@ const defaultValues = {
   foilColor: "серебро",
 };
 
+// Включённые опции
 const enabledOptions = {
   bending: false,
   round_corners: false,
@@ -22,6 +25,9 @@ const enabledOptions = {
   lamination: true,
   foil: true,
 };
+
+// Предустановленные размеры
+const availableSizes = ["A5 (148×210 мм)", "A4 (210×297 мм)", "90×50 мм"];
 </script>
 
 <template>
@@ -30,6 +36,7 @@ const enabledOptions = {
     icon="/icons/default.svg"
     :defaultValues="defaultValues"
     :enabledOptions="enabledOptions"
+    :availableSizes="availableSizes"
     :previewComponent="LeafletsPreview"
   />
 </template>

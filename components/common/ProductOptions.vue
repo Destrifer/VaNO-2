@@ -1,5 +1,6 @@
 <script setup>
 import { ref, watch } from "vue";
+import settings from "@/assets/settings_print.json";
 
 const props = defineProps({
   diameter: Number,
@@ -20,6 +21,10 @@ const props = defineProps({
       foil: true,
     }),
   },
+  availableSizes: {
+    type: Array,
+    default: () => [], // список ключей из settings.sizes
+  },
 });
 
 const emit = defineEmits([
@@ -34,7 +39,7 @@ const emit = defineEmits([
   "update:printMode",
 ]);
 
-// Прокси-поля для v-model
+// v-model прокси
 const materialProxy = ref(props.material);
 const laminationProxy = ref(props.lamination);
 const printModeProxy = ref(props.printMode);
@@ -42,7 +47,34 @@ const useLaminationProxy = ref(props.useLamination);
 const useFoilProxy = ref(props.useFoil);
 const foilColorProxy = ref(props.foilColor);
 
-// Синхронизация props -> ref
+// Размеры
+const selectedFormat = ref("Custom");
+
+// Пробуем задать формат при загрузке (если width/height совпадают)
+watch(
+  () => [props.width, props.height],
+  ([w, h]) => {
+    for (const key of props.availableSizes) {
+      const size = settings.sizes[key];
+      if (size && size.width === w && size.height === h) {
+        selectedFormat.value = key;
+        return;
+      }
+    }
+    selectedFormat.value = "Custom";
+  },
+  { immediate: true }
+);
+
+// Смена формата → обновить ширину/высоту
+watch(selectedFormat, (val) => {
+  if (val !== "Custom" && settings.sizes[val]) {
+    emit("update:width", settings.sizes[val].width);
+    emit("update:height", settings.sizes[val].height);
+  }
+});
+
+// watchers props -> ref
 watch(
   () => props.material,
   (val) => (materialProxy.value = val)
@@ -68,7 +100,7 @@ watch(
   (val) => (foilColorProxy.value = val)
 );
 
-// Синхронизация ref -> emit
+// ref -> emit
 watch(materialProxy, (val) => emit("update:material", val));
 watch(laminationProxy, (val) => emit("update:lamination", val));
 watch(printModeProxy, (val) => emit("update:printMode", val));
@@ -94,27 +126,40 @@ watch(foilColorProxy, (val) => emit("update:foilColor", val));
     </template>
 
     <template v-else>
-      <label class="block">
-        Ширина (мм):
-        <input
-          type="number"
-          min="1"
-          class="mt-1 border px-2 py-1 w-full"
-          :value="width"
-          @input="emit('update:width', +$event.target.value)"
-        />
+      <!-- Форматы -->
+      <label class="block" v-if="availableSizes.length">
+        Формат:
+        <select v-model="selectedFormat" class="mt-1 border px-2 py-1 w-full">
+          <option v-for="key in availableSizes" :key="key" :value="key">
+            {{ key }}
+          </option>
+          <option value="Custom">Свой размер</option>
+        </select>
       </label>
 
-      <label class="block">
-        Высота (мм):
-        <input
-          type="number"
-          min="1"
-          class="mt-1 border px-2 py-1 w-full"
-          :value="height"
-          @input="emit('update:height', +$event.target.value)"
-        />
-      </label>
+      <template v-if="selectedFormat === 'Custom' || !availableSizes.length">
+        <label class="block">
+          Размер (мм):
+          <div class="mt-1 flex items-center gap-2">
+            <input
+              type="number"
+              min="1"
+              class="border px-2 py-1 w-24"
+              :value="width"
+              @input="emit('update:width', +$event.target.value)"
+            />
+            <span>×</span>
+            <input
+              type="number"
+              min="1"
+              class="border px-2 py-1 w-24"
+              :value="height"
+              @input="emit('update:height', +$event.target.value)"
+            />
+            <span>мм</span>
+          </div>
+        </label>
+      </template>
 
       <label class="block">
         Печать:
