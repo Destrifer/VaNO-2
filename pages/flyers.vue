@@ -27,7 +27,7 @@ const enabledOptions = {
 <template>
   <ProductCalculator
     title="Листовки"
-    icon="/icons/leaflet.svg"
+    icon="/icons/default.svg"
     :defaultValues="defaultValues"
     :enabledOptions="enabledOptions"
     :previewComponent="LeafletsPreview"
