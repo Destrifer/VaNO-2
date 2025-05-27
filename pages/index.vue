@@ -20,9 +20,11 @@
     >
       Перейти в каталог!
     </NuxtLink>
+    <ProductCardsGrid :list="['/flyers', '/business-cards', '/stickers']" />
   </section>
 </template>
 
 <script setup>
 import ImageCarousel from "@/components/ImageCarousel.vue";
+import ProductCardsGrid from "~/components/ProductCardsGrid.vue";
 </script>
