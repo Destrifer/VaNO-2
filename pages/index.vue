@@ -1,9 +1,18 @@
 <template>
-  <section class="text-center py-16">
+  <section class="text-center py-16 space-y-5">
     <h1 class="text-4xl md:text-6xl font-bold text-text mb-6">
       Добро пожаловать в CentralPrint
     </h1>
-
+    <ProductCardsGrid
+      :list="[
+        '/flyers',
+        '/booklets',
+        '/stickers',
+        '/tags',
+        '/posters',
+        '/certificates',
+      ]"
+    />
     <ImageCarousel
       :images="[
         '/images/products/business-cards/pexels-francesco-ungaro-1525041.jpg',
@@ -20,7 +29,6 @@
     >
       Перейти в каталог!
     </NuxtLink>
-    <ProductCardsGrid :list="['/flyers', '/business-cards', '/stickers']" />
   </section>
 </template>
 

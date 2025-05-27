@@ -31,15 +31,15 @@ export const products = [
   {
     title: "Визитки",
     href: "/business-cards",
-    minPriceParams: {
-      width: 90,
-      height: 50,
-      materialKey: "Мелованная матовая 300 гр.",
-    },
   },
   {
     title: "Бирки и воблеры",
     href: "/tags",
+    minPriceParams: {
+      width: 60,
+      height: 40,
+      materialKey: "Мелованная матовая 250 гр.",
+    },
   },
   {
     title: "Календари",
@@ -51,7 +51,7 @@ export const products = [
     icon: "/icons/default.svg",
     minPriceParams: {
       width: 148,
-      height: 210,
+      height: 105,
       materialKey: "Мелованная матовая 150 гр.",
     },
   },
@@ -82,6 +82,11 @@ export const products = [
   {
     title: "Плакаты",
     href: "/posters",
+    minPriceParams: {
+      width: 210,
+      height: 297,
+      materialKey: "Мелованная матовая 150 гр.",
+    },
   },
   {
     title: "Чертежи",
@@ -90,14 +95,29 @@ export const products = [
   {
     title: "Грамоты",
     href: "/certificates",
+    minPriceParams: {
+      width: 210,
+      height: 148,
+      materialKey: "Мелованная матовая 250 гр.",
+    },
   },
   {
     title: "Благодарности",
     href: "/gratitudes",
+    minPriceParams: {
+      width: 210,
+      height: 148,
+      materialKey: "Мелованная матовая 250 гр.",
+    },
   },
   {
     title: "Сертификаты",
     href: "/licenses",
+    minPriceParams: {
+      width: 210,
+      height: 297,
+      materialKey: "Мелованная матовая 300 гр.",
+    },
   },
   {
     title: "Хенгеры",
@@ -106,18 +126,38 @@ export const products = [
   {
     title: "Бланки",
     href: "/forms",
+    minPriceParams: {
+      width: 210,
+      height: 148,
+      materialKey: "Офсетная 80 гр.",
+    },
   },
   {
     title: "Бейджи",
     href: "/badges",
+    minPriceParams: {
+      width: 100,
+      height: 70,
+      materialKey: "Мелованная матовая 300 гр.",
+    },
   },
   {
     title: "Ценники",
     href: "/pricetags",
+    minPriceParams: {
+      width: 40,
+      height: 60,
+      materialKey: "Мелованная матовая 300 гр.",
+    },
   },
   {
     title: "Открытки",
     href: "/cards",
+    minPriceParams: {
+      width: 210,
+      height: 148,
+      materialKey: "Мелованная матовая 250 гр.",
+    },
   },
   {
     title: "Конверты",
@@ -126,6 +166,11 @@ export const products = [
   {
     title: "Пригласительные",
     href: "/invites",
+    minPriceParams: {
+      width: 200,
+      height: 100,
+      materialKey: "Мелованная матовая 250 гр.",
+    },
   },
   {
     title: "Брошюры",
@@ -142,18 +187,38 @@ export const products = [
   {
     title: "Лифлеты",
     href: "/leaflets",
+    minPriceParams: {
+      width: 210,
+      height: 297,
+      materialKey: "Мелованная матовая 170 гр.",
+    },
   },
   {
     title: "Документация",
     href: "/docs",
+    minPriceParams: {
+      width: 210,
+      height: 297,
+      materialKey: "Офсетная 80 гр.",
+    },
   },
   {
     title: "Билеты",
     href: "/tickets",
+    minPriceParams: {
+      width: 210,
+      height: 74,
+      materialKey: "Мелованная матовая 200 гр.",
+    },
   },
   {
     title: "Купоны",
     href: "/coupons",
+    minPriceParams: {
+      width: 210,
+      height: 74,
+      materialKey: "Мелованная матовая 200 гр.",
+    },
   },
   {
     title: "Тетради",

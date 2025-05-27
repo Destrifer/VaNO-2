@@ -39,18 +39,19 @@ const productList = computed(() => {
 </script>
 
 <template>
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-12">
+  <div
+    class="grid gap-6 mt-12"
+    style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr))"
+  >
     <NuxtLink
       v-for="product in productList"
       :key="product.href"
       :to="product.href"
-      class="block border rounded-xl p-4 hover:shadow-lg transition text-left"
+      class="p-4 hover:shadow-lg transition border rounded-xl bg-white flex flex-col items-center text-center"
     >
-      <div class="flex items-center gap-3 mb-2">
-        <img :src="product.icon" alt="" class="w-6 h-6 object-contain" />
-        <div class="font-semibold text-lg">{{ product.title }}</div>
-      </div>
-      <div v-if="product.pricePerUnit" class="text-sm text-gray-500">
+      <img :src="product.icon" alt="" class="w-24 h-24 object-contain mb-2" />
+      <div class="font-semibold text-lg">{{ product.title }}</div>
+      <div v-if="product.pricePerUnit" class="text-sm text-gray-500 mt-1">
         от <strong>{{ product.pricePerUnit.toFixed(2) }} ₽</strong> / шт
       </div>
     </NuxtLink>
