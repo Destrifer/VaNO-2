@@ -1,57 +1,3 @@
-<script setup>
-import { computed } from "vue";
-import { useCartStore } from "@/stores/cart";
-
-const cart = useCartStore();
-
-const removeItem = (index) => {
-  cart.items.splice(index, 1);
-};
-
-const removeFile = (itemIndex, fileIndex) => {
-  cart.items[itemIndex].files.splice(fileIndex, 1);
-};
-
-const onFilesChange = (e, itemIndex) => {
-  const files = Array.from(e.target.files);
-  const allowedExtensions = [
-    "jpg",
-    "jpeg",
-    "png",
-    "tiff",
-    "svg",
-    "pdf",
-    "ai",
-    "psd",
-    "rar",
-    "zip",
-  ];
-
-  const validFiles = files.filter((file) => {
-    const ext = file.name.split(".").pop().toLowerCase();
-    return allowedExtensions.includes(ext);
-  });
-
-  if (!cart.items[itemIndex].files) {
-    cart.items[itemIndex].files = [];
-  }
-
-  cart.items[itemIndex].files = [
-    ...cart.items[itemIndex].files,
-    ...validFiles,
-  ].slice(0, 3);
-};
-
-const cartTotal = computed(() => {
-  return cart.items.reduce((sum, item) => {
-    let extraPrice = 0;
-    if (item.simpleDesign) extraPrice += 900;
-    if (item.photoRedraw) extraPrice += 500;
-    return sum + item.price + extraPrice;
-  }, 0);
-});
-</script>
-
 <template>
   <div class="space-y-6 w-full">
     <h2 class="text-2xl font-bold">Ваш заказ</h2>
@@ -68,12 +14,11 @@ const cartTotal = computed(() => {
       >
         <button
           @click="removeItem(index)"
-          class="absolute top-0 right-2 text-3xl text-red-500 hover:text-red-700 hover:cursor-pointer"
+          class="absolute top-0 right-2 text-3xl text-red-500 hover:text-red-700"
         >
           ×
         </button>
 
-        <!-- Иконка -->
         <div class="self-start">
           <img
             :src="item.icon || '/icons/default.svg'"
@@ -82,36 +27,42 @@ const cartTotal = computed(() => {
           />
         </div>
 
-        <!-- Информация -->
         <div class="flex-1 space-y-2">
           <div class="font-semibold text-2xl">{{ item.title }}</div>
 
           <ul v-if="item.options" class="text-sm text-gray-700 space-y-1">
-            <li v-for="(val, key) in item.options" :key="key">
-              <template v-if="key.toLowerCase() === 'тираж'">
-                <template v-if="Array.isArray(val)">
+            <template
+              v-for="(key, i) in getFilteredKeys(item.options)"
+              :key="i"
+            >
+              <li v-if="key.toLowerCase() === 'тираж'">
+                <template v-if="Array.isArray(item.options[key])">
                   <div class="flex justify-between">
                     <strong>Тираж:</strong>
-                    {{ val.reduce((sum, qty) => sum + qty, 0) }} шт
+                    {{
+                      item.options[key].reduce((sum, qty) => sum + qty, 0)
+                    }}
+                    шт
                   </div>
                   <ul class="pl-4 list-disc">
-                    <li v-for="(qty, i) in val" :key="i">
-                      Вид {{ i + 1 }}: {{ qty }} шт
+                    <li v-for="(qty, j) in item.options[key]" :key="j">
+                      Вид {{ j + 1 }}: {{ qty }} шт
                     </li>
                   </ul>
                 </template>
                 <template v-else>
                   <div class="flex justify-between">
-                    <strong>Тираж:</strong> {{ val }} шт
+                    <strong>Тираж:</strong> {{ item.options[key] }} шт
                   </div>
                 </template>
-              </template>
-              <template v-else>
+              </li>
+              <li v-else>
                 <div class="flex justify-between text-right">
-                  <strong class="text-left">{{ key }}:</strong> {{ val }}
+                  <strong class="text-left">{{ key }}:</strong>
+                  {{ item.options[key] }}
                 </div>
-              </template>
-            </li>
+              </li>
+            </template>
           </ul>
 
           <div class="flex justify-between">
@@ -120,17 +71,17 @@ const cartTotal = computed(() => {
 
           <div class="space-y-1">
             <label class="flex items-center gap-2 justify-between">
-              <span
-                ><input type="checkbox" v-model="item.simpleDesign" /> Простой
-                дизайн</span
-              >
+              <span>
+                <input type="checkbox" v-model="item.simpleDesign" />
+                Простой дизайн
+              </span>
               +900 ₽
             </label>
             <label class="flex items-center gap-2 justify-between">
               <span>
                 <input type="checkbox" v-model="item.photoRedraw" />
-                Отрисовка по фото</span
-              >
+                Отрисовка по фото
+              </span>
               +500 ₽
             </label>
           </div>
@@ -181,3 +132,71 @@ const cartTotal = computed(() => {
     </div>
   </div>
 </template>
+
+<script setup>
+import { computed } from "vue";
+import { useCartStore } from "@/stores/cart";
+
+const cart = useCartStore();
+
+const removeItem = (index) => {
+  cart.items.splice(index, 1);
+};
+
+const removeFile = (itemIndex, fileIndex) => {
+  cart.items[itemIndex].files.splice(fileIndex, 1);
+};
+
+const onFilesChange = (e, itemIndex) => {
+  const files = Array.from(e.target.files);
+  const allowedExtensions = [
+    "jpg",
+    "jpeg",
+    "png",
+    "tiff",
+    "svg",
+    "pdf",
+    "ai",
+    "psd",
+    "rar",
+    "zip",
+  ];
+
+  const validFiles = files.filter((file) => {
+    const ext = file.name.split(".").pop().toLowerCase();
+    return allowedExtensions.includes(ext);
+  });
+
+  if (!cart.items[itemIndex].files) {
+    cart.items[itemIndex].files = [];
+  }
+
+  cart.items[itemIndex].files = [
+    ...cart.items[itemIndex].files,
+    ...validFiles,
+  ].slice(0, 3);
+};
+
+const getFilteredKeys = (options) => {
+  return Object.entries(options)
+    .filter(([key, val]) => {
+      if (val === null || val === undefined) return false;
+      if (typeof val === "string") {
+        const lowered = val.toLowerCase();
+        return !(lowered === "нет" || lowered === "без ламинации");
+      }
+      if (Array.isArray(val)) return val.some((v) => !!v);
+      return !!val;
+    })
+    .map(([key]) => key);
+};
+
+const cartTotal = computed(() => {
+  return cart.items.reduce((sum, item) => {
+    let extraPrice = 0;
+    if (item.simpleDesign) extraPrice += 900;
+    if (item.photoRedraw) extraPrice += 500;
+    return sum + item.price + extraPrice;
+  }, 0);
+});
+</script>
