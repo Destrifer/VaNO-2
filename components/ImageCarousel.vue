@@ -49,14 +49,17 @@ onMounted(async () => {
         data-fancybox="gallery"
         class="basis-1/2 sm:basis-1/3 lg:basis-1/4 shrink-0 px-2"
       >
-        <NuxtImg
-          :src="img"
-          format="webp"
-          sizes="sm:100vw md:50vw lg:25vw"
-          quality="75"
-          class="w-full h-auto object-cover rounded-xl"
-          loading="lazy"
-        />
+        <div class="aspect-[16/9] w-full overflow-hidden rounded-xl">
+          <NuxtImg
+            :src="img"
+            format="avif,webp,jpg"
+            quality="70"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            densities="1x 2x"
+            class="w-full h-full object-cover object-center"
+            loading="lazy"
+          />
+        </div>
       </a>
     </div>
   </div>

@@ -15,11 +15,29 @@
     />
     <ImageCarousel
       :images="[
-        '/images/products/business-cards/pexels-francesco-ungaro-1525041.jpg',
-        '/images/products/business-cards/pexels-lilartsy-1213447.jpg',
-        '/images/products/business-cards/pexels-maoriginalphotography-1485894.jpg',
-        '/images/products/business-cards/pexels-simon73-1183099.jpg',
-        '/images/products/business-cards/pexels-steve-1266808.jpg',
+        '/images/main/1.jpg',
+        '/images/main/2.jpg',
+        '/images/main/3.jpg',
+        '/images/main/4.jpg',
+        '/images/main/5.jpg',
+        '/images/main/6.jpg',
+        '/images/main/7.jpg',
+        '/images/main/8.jpg',
+        '/images/main/9.jpg',
+        '/images/main/10.jpg',
+        '/images/main/11.jpg',
+        '/images/main/12.jpg',
+        '/images/main/13.jpg',
+        '/images/main/14.jpg',
+        '/images/main/15.jpg',
+        '/images/main/16.jpg',
+        '/images/main/17.jpg',
+        '/images/main/18.jpg',
+        '/images/main/19.jpg',
+        '/images/main/20.jpg',
+        '/images/main/21.jpg',
+        '/images/main/22.jpg',
+        '/images/main/23.jpg',
       ]"
     />
 
