@@ -14,6 +14,7 @@
         v-model:useLamination="useLamination"
         v-model:useFoil="useFoil"
         v-model:foilColor="foilColor"
+        v-model:isComplexShape="isComplexShape"
         :materials="materialsWithStatus"
         :laminations="settings.lamination"
         @update:width="(val) => (width = val)"
@@ -161,8 +162,14 @@
           </li>
 
           <li>
-            Резка ({{ settings.cutting_percentage }}%):
+            Резка:
             <strong>{{ result.cutting.toFixed(2) }} ₽</strong>
+            <span v-if="result.usePlotter" class="text-gray-500 italic"
+              >(плоттер)</span
+            >
+            <span v-else class="text-gray-500 italic"
+              >({{ settings.cutting_percentage }}%)</span
+            >
           </li>
 
           <li class="text-lg font-bold mt-3">
@@ -222,6 +229,7 @@ const useLamination = ref(props.defaultValues.useLamination);
 const useFoil = ref(props.defaultValues.useFoil);
 const foilColor = ref(props.defaultValues.foilColor);
 
+const isComplexShape = ref(false);
 const useBending = ref(false);
 const bendingFolds = ref(1);
 const useRoundCorners = ref(false);
@@ -257,6 +265,7 @@ const result = computed(() =>
     cornerCount: cornerCount.value,
     drillType: drillType.value,
     holeCount: holeCount.value,
+    isComplexShape: isComplexShape.value,
     enabledOptions: props.enabledOptions,
   })
 );
@@ -380,6 +389,7 @@ const handleOrder = () => {
           : drillType.value === "drilling"
           ? `${holeCount.value} отверстий`
           : "Нет",
+      "Сложная форма": isComplexShape.value ? "Да" : "Нет",
     },
     price: result.value.total,
   });

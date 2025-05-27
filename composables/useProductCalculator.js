@@ -1,4 +1,3 @@
-// composables/useProductCalculator.js
 export function useProductCalculator(settings) {
   const getTierPrice = (tiers, value) =>
     tiers.find((t) => value <= t.to)?.price ?? tiers.at(-1)?.price ?? 0;
@@ -20,6 +19,7 @@ export function useProductCalculator(settings) {
       cornerCount,
       drillType,
       holeCount,
+      isComplexShape = false,
       enabledOptions = {},
     } = config;
 
@@ -28,7 +28,13 @@ export function useProductCalculator(settings) {
       0
     );
 
-    const sheet = settings.sheet;
+    // ⛳ Условие перехода на плоттерную резку
+    const usePlotter =
+      isComplexShape || Number(width) < 40 || Number(height) < 40;
+
+    // 🧾 Выбор листа
+    const sheet = usePlotter ? settings.plotter_sheet : settings.sheet;
+
     const sizeWithMarginX = Number(width) + sheet.margin * 2;
     const sizeWithMarginY = Number(height) + sheet.margin * 2;
     const sizeWithMarginAltX = Number(height) + sheet.margin * 2;
@@ -61,10 +67,21 @@ export function useProductCalculator(settings) {
 
     const subtotal = sheetsNeeded * unitPrice;
     const foilTotal = foil * sheetsNeeded;
-    const cutting =
-      (subtotal + foilTotal + laminationSetup) *
-      (settings.cutting_percentage / 100);
 
+    // ✂ Резка — обычная или плоттерная
+    let cutting = 0;
+
+    if (usePlotter) {
+      cutting =
+        getTierPrice(settings.plotter_cutting_price, sheetsNeeded) *
+        sheetsNeeded;
+    } else {
+      cutting =
+        (subtotal + foilTotal + laminationSetup) *
+        (settings.cutting_percentage / 100);
+    }
+
+    // ➕ Доп. опции
     let extras = laminationSetup;
 
     if (
@@ -104,6 +121,7 @@ export function useProductCalculator(settings) {
     }
 
     return {
+      usePlotter,
       itemsPerSheet,
       sheetsNeeded,
       unitPrice,

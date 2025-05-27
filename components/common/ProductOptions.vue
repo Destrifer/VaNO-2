@@ -12,6 +12,7 @@ const props = defineProps({
   useFoil: Boolean,
   foilColor: String,
   printMode: String,
+  isComplexShape: Boolean, // 👈 добавлено
   materials: Array,
   laminations: Object,
   enabledOptions: {
@@ -23,7 +24,7 @@ const props = defineProps({
   },
   availableSizes: {
     type: Array,
-    default: () => [], // список ключей из settings.sizes
+    default: () => [],
   },
 });
 
@@ -37,42 +38,19 @@ const emit = defineEmits([
   "update:useFoil",
   "update:foilColor",
   "update:printMode",
+  "update:isComplexShape", // 👈 добавлено
 ]);
 
-// v-model прокси
+// Прокси-поля
 const materialProxy = ref(props.material);
 const laminationProxy = ref(props.lamination);
 const printModeProxy = ref(props.printMode);
 const useLaminationProxy = ref(props.useLamination);
 const useFoilProxy = ref(props.useFoil);
 const foilColorProxy = ref(props.foilColor);
+const isComplexShapeProxy = ref(props.isComplexShape); // 👈 добавлено
 
-// Размеры
 const selectedFormat = ref("Custom");
-
-// Пробуем задать формат при загрузке (если width/height совпадают)
-watch(
-  () => [props.width, props.height],
-  ([w, h]) => {
-    for (const key of props.availableSizes) {
-      const size = settings.sizes[key];
-      if (size && size.width === w && size.height === h) {
-        selectedFormat.value = key;
-        return;
-      }
-    }
-    selectedFormat.value = "Custom";
-  },
-  { immediate: true }
-);
-
-// Смена формата → обновить ширину/высоту
-watch(selectedFormat, (val) => {
-  if (val !== "Custom" && settings.sizes[val]) {
-    emit("update:width", settings.sizes[val].width);
-    emit("update:height", settings.sizes[val].height);
-  }
-});
 
 // watchers props -> ref
 watch(
@@ -99,19 +77,46 @@ watch(
   () => props.foilColor,
   (val) => (foilColorProxy.value = val)
 );
+watch(
+  () => props.isComplexShape,
+  (val) => (isComplexShapeProxy.value = val)
+); // 👈
 
-// ref -> emit
 watch(materialProxy, (val) => emit("update:material", val));
 watch(laminationProxy, (val) => emit("update:lamination", val));
 watch(printModeProxy, (val) => emit("update:printMode", val));
 watch(useLaminationProxy, (val) => emit("update:useLamination", val));
 watch(useFoilProxy, (val) => emit("update:useFoil", val));
 watch(foilColorProxy, (val) => emit("update:foilColor", val));
+watch(isComplexShapeProxy, (val) => emit("update:isComplexShape", val)); // 👈
+
+// попытка установить формат
+watch(
+  () => [props.width, props.height],
+  ([w, h]) => {
+    for (const key of props.availableSizes) {
+      const size = settings.sizes[key];
+      if (size && size.width === w && size.height === h) {
+        selectedFormat.value = key;
+        return;
+      }
+    }
+    selectedFormat.value = "Custom";
+  },
+  { immediate: true }
+);
+
+watch(selectedFormat, (val) => {
+  if (val !== "Custom" && settings.sizes[val]) {
+    emit("update:width", settings.sizes[val].width);
+    emit("update:height", settings.sizes[val].height);
+  }
+});
 </script>
 
 <template>
   <div class="space-y-4">
-    <!-- Размер -->
+    <!-- Диаметр -->
     <template v-if="diameter !== undefined">
       <label class="block">
         Диаметр (мм):
@@ -137,6 +142,13 @@ watch(foilColorProxy, (val) => emit("update:foilColor", val));
         </select>
       </label>
 
+      <!-- Сложная форма -->
+      <label class="block text-sm">
+        <input type="checkbox" v-model="isComplexShapeProxy" class="mr-2" />
+        Сложная форма (облако, вырубка и т.п.)
+      </label>
+
+      <!-- Ширина × Высота -->
       <template v-if="selectedFormat === 'Custom' || !availableSizes.length">
         <label class="block">
           Размер (мм):
@@ -161,6 +173,7 @@ watch(foilColorProxy, (val) => emit("update:foilColor", val));
         </label>
       </template>
 
+      <!-- Печать -->
       <label class="block">
         Печать:
         <select class="mt-1 border px-2 py-1 w-full" v-model="printModeProxy">

@@ -90,6 +90,22 @@
     "height": 309,
     "margin": 2
   },
+  "plotter_sheet": {
+    "width": 290,
+    "height": 405,
+    "margin": 2
+  },
+  "cutting_percentage": 15,
+  "plotter_cutting_price": [
+    { "to": 10, "price": 60 },
+    { "to": 24, "price": 80 },
+    { "to": 49, "price": 100 },
+    { "to": 85, "price": 150 },
+    { "to": 104, "price": 200 },
+    { "to": 150, "price": 250 },
+    { "to": 250, "price": 300 },
+    { "to": 999999, "price": 400 }
+  ],
   "options": {
     "bending": {
       "enabled": true,
@@ -119,6 +135,5 @@
       "enabled": false,
       "per_item": 15
     }
-  },
-  "cutting_percentage": 15
+  }
 }
