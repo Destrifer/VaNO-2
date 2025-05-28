@@ -21,6 +21,7 @@
         @update:width="(val) => (width = val)"
         @update:height="(val) => (height = val)"
         :printMode="printMode"
+        :printOptions="['4+0']"
         @update:printMode="(val) => (printMode = val)"
         :enabledOptions="enabledOptions"
         :availableSizes="availableSizes"

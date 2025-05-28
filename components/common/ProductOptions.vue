@@ -33,6 +33,10 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  printOptions: {
+    type: Array,
+    default: () => ["4+0", "4+4"],
+  },
 });
 
 const emit = defineEmits([
@@ -173,11 +177,12 @@ watch(selectedFormat, (val) => {
         </label>
       </template>
 
-      <label class="block">
+      <label class="block" v-if="printOptions.length > 1">
         Печать:
         <select class="mt-1 border px-2 py-1 w-full" v-model="printModeProxy">
-          <option value="4+0">4+0</option>
-          <option value="4+4">4+4</option>
+          <option v-for="mode in printOptions" :key="mode" :value="mode">
+            {{ mode }}
+          </option>
         </select>
       </label>
     </template>
