@@ -1,6 +1,5 @@
 <script setup>
 import { ref, watch } from "vue";
-import settings from "@/assets/settings_print.json";
 
 const props = defineProps({
   diameter: Number,
@@ -12,9 +11,17 @@ const props = defineProps({
   useFoil: Boolean,
   foilColor: String,
   printMode: String,
-  isComplexShape: Boolean, // 👈 добавлено
+  isComplexShape: Boolean,
   materials: Array,
   laminations: Object,
+  showComplexShape: {
+    type: Boolean,
+    default: false,
+  },
+  sizes: {
+    type: Object,
+    default: () => ({}),
+  },
   enabledOptions: {
     type: Object,
     default: () => ({
@@ -38,21 +45,19 @@ const emit = defineEmits([
   "update:useFoil",
   "update:foilColor",
   "update:printMode",
-  "update:isComplexShape", // 👈 добавлено
+  "update:isComplexShape",
 ]);
 
-// Прокси-поля
 const materialProxy = ref(props.material);
 const laminationProxy = ref(props.lamination);
 const printModeProxy = ref(props.printMode);
 const useLaminationProxy = ref(props.useLamination);
 const useFoilProxy = ref(props.useFoil);
 const foilColorProxy = ref(props.foilColor);
-const isComplexShapeProxy = ref(props.isComplexShape); // 👈 добавлено
+const isComplexShapeProxy = ref(props.isComplexShape);
 
 const selectedFormat = ref("Custom");
 
-// watchers props -> ref
 watch(
   () => props.material,
   (val) => (materialProxy.value = val)
@@ -80,7 +85,7 @@ watch(
 watch(
   () => props.isComplexShape,
   (val) => (isComplexShapeProxy.value = val)
-); // 👈
+);
 
 watch(materialProxy, (val) => emit("update:material", val));
 watch(laminationProxy, (val) => emit("update:lamination", val));
@@ -88,14 +93,13 @@ watch(printModeProxy, (val) => emit("update:printMode", val));
 watch(useLaminationProxy, (val) => emit("update:useLamination", val));
 watch(useFoilProxy, (val) => emit("update:useFoil", val));
 watch(foilColorProxy, (val) => emit("update:foilColor", val));
-watch(isComplexShapeProxy, (val) => emit("update:isComplexShape", val)); // 👈
+watch(isComplexShapeProxy, (val) => emit("update:isComplexShape", val));
 
-// попытка установить формат
 watch(
   () => [props.width, props.height],
   ([w, h]) => {
     for (const key of props.availableSizes) {
-      const size = settings.sizes[key];
+      const size = props.sizes[key];
       if (size && size.width === w && size.height === h) {
         selectedFormat.value = key;
         return;
@@ -107,16 +111,15 @@ watch(
 );
 
 watch(selectedFormat, (val) => {
-  if (val !== "Custom" && settings.sizes[val]) {
-    emit("update:width", settings.sizes[val].width);
-    emit("update:height", settings.sizes[val].height);
+  if (val !== "Custom" && props.sizes[val]) {
+    emit("update:width", props.sizes[val].width);
+    emit("update:height", props.sizes[val].height);
   }
 });
 </script>
 
 <template>
   <div class="space-y-4">
-    <!-- Диаметр -->
     <template v-if="diameter !== undefined">
       <label class="block">
         Диаметр (мм):
@@ -131,7 +134,6 @@ watch(selectedFormat, (val) => {
     </template>
 
     <template v-else>
-      <!-- Форматы -->
       <label class="block" v-if="availableSizes.length">
         Формат:
         <select v-model="selectedFormat" class="mt-1 border px-2 py-1 w-full">
@@ -142,13 +144,11 @@ watch(selectedFormat, (val) => {
         </select>
       </label>
 
-      <!-- Сложная форма -->
-      <label class="block text-sm">
+      <label v-if="showComplexShape" class="block text-sm">
         <input type="checkbox" v-model="isComplexShapeProxy" class="mr-2" />
         Сложная форма (облако, вырубка и т.п.)
       </label>
 
-      <!-- Ширина × Высота -->
       <template v-if="selectedFormat === 'Custom' || !availableSizes.length">
         <label class="block">
           Размер (мм):
@@ -173,7 +173,6 @@ watch(selectedFormat, (val) => {
         </label>
       </template>
 
-      <!-- Печать -->
       <label class="block">
         Печать:
         <select class="mt-1 border px-2 py-1 w-full" v-model="printModeProxy">
@@ -183,7 +182,6 @@ watch(selectedFormat, (val) => {
       </label>
     </template>
 
-    <!-- Материал -->
     <label class="block">
       Материал:
       <select class="mt-1 border px-2 py-1 w-full" v-model="materialProxy">
@@ -198,7 +196,6 @@ watch(selectedFormat, (val) => {
       </select>
     </label>
 
-    <!-- Ламинация -->
     <template v-if="enabledOptions.lamination">
       <div class="block">
         <label class="flex items-center gap-2 mb-1">
@@ -231,7 +228,6 @@ watch(selectedFormat, (val) => {
       </div>
     </template>
 
-    <!-- Фольгирование -->
     <template v-if="enabledOptions.foil">
       <div class="block">
         <label class="flex items-center gap-2">

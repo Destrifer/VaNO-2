@@ -1,0 +1,72 @@
+{
+  "materials": {
+    "Самоклейка 80г/м² полуглянцевая": 45,
+    "Самоклейка 80г/м² матовая (без покрытия)": 45,
+    "Пленка Polylaser 80г/м² матовая": 150,
+    "Пленка Polylaser 80г/м² глянцевая": 150,
+    "Пленка Muflon 80г/м² глянцевая": 80,
+    "Пленка Muflon 80г/м² матовая": 120,
+    "Пленка Muflon 80г/м² прозрачная": 80,
+    "Пленка 80г/м² серебряная Oracal": 650
+  },
+  "lamination": {
+    "Глянцевая 25 мкр": 30,
+    "Матовая 25 мкр": 30,
+    "Soft touch 30 мкр": 70
+  },
+  "print_price": {
+    "4+0": [
+      { "to": 10, "price": 80 },
+      { "to": 50, "price": 60 },
+      { "to": 100, "price": 55 },
+      { "to": 200, "price": 50 },
+      { "to": 300, "price": 47 },
+      { "to": 400, "price": 45 },
+      { "to": 500, "price": 42 },
+      { "to": 750, "price": 40 },
+      { "to": 1000, "price": 37 },
+      { "to": 2000, "price": 35 },
+      { "to": 4000, "price": 32 },
+      { "to": 999999, "price": 30 }
+    ]
+  },
+  "foil_price": [
+    { "to": 10, "price": 400 },
+    { "to": 30, "price": 350 },
+    { "to": 50, "price": 300 },
+    { "to": 100, "price": 250 },
+    { "to": 200, "price": 170 },
+    { "to": 300, "price": 150 },
+    { "to": 500, "price": 135 },
+    { "to": 999999, "price": 120 }
+  ],
+  "foil_colors": {
+    "серебро": "/images/foil/silver.png",
+    "золото": "/images/foil/gold.png",
+    "синий": "/images/foil/blue.png",
+    "красный": "/images/foil/red.png",
+    "зеленый": "/images/foil/green.png",
+    "бронза": "/images/foil/bronze.png"
+  },
+  "sheet": {
+    "width": 290,
+    "height": 405,
+    "margin": 2
+  },
+  "plotter_sheet": {
+    "width": 290,
+    "height": 405,
+    "margin": 2
+  },
+  "plotter_cutting_price": [
+    { "to": 10, "price": 60 },
+    { "to": 24, "price": 80 },
+    { "to": 49, "price": 100 },
+    { "to": 85, "price": 150 },
+    { "to": 104, "price": 200 },
+    { "to": 150, "price": 250 },
+    { "to": 250, "price": 300 },
+    { "to": 999999, "price": 400 }
+  ],
+  "options": {}
+}

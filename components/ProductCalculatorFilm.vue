@@ -7,15 +7,15 @@
       <ProductViews v-model="views" />
 
       <ProductOptions
+        :diameter="props.diameter"
         :width="width"
         :height="height"
+        v-model:diameter="diameter"
         v-model:material="materialKey"
         v-model:lamination="laminationKey"
         v-model:useLamination="useLamination"
         v-model:useFoil="useFoil"
         v-model:foilColor="foilColor"
-        v-model:isComplexShape="isComplexShape"
-        :showComplexShape="true"
         :materials="materialsWithStatus"
         :laminations="settings.lamination"
         @update:width="(val) => (width = val)"
@@ -24,7 +24,7 @@
         @update:printMode="(val) => (printMode = val)"
         :enabledOptions="enabledOptions"
         :availableSizes="availableSizes"
-        :sizes="settings.sizes"
+        :sizes="{}"
       />
 
       <FoilPreview
@@ -32,71 +32,6 @@
         :foilColor="foilColor"
         @update:foilColor="(val) => (foilColor = val)"
       />
-
-      <div class="space-y-2">
-        <template v-if="enabledOptions.bending">
-          <label class="flex items-center gap-2">
-            <input type="checkbox" v-model="useBending" />
-            Биговка
-          </label>
-          <div v-if="useBending" class="ml-4">
-            Кол-во фальцев:
-            <input
-              type="number"
-              min="1"
-              max="2"
-              v-model.number="bendingFolds"
-              class="border px-2 py-1 w-20"
-            />
-          </div>
-        </template>
-
-        <template v-if="enabledOptions.round_corners">
-          <label class="flex items-center gap-2">
-            <input type="checkbox" v-model="useRoundCorners" />
-            Скругление уголков
-          </label>
-          <div v-if="useRoundCorners" class="ml-4">
-            Кол-во углов:
-            <input
-              type="number"
-              min="1"
-              max="4"
-              v-model.number="cornerCount"
-              class="border px-2 py-1 w-20"
-            />
-          </div>
-        </template>
-
-        <template v-if="enabledOptions.pikallo || enabledOptions.drilling">
-          <label class="block">
-            Пиккало / Сверление:
-            <select v-model="drillType" class="mt-1 border px-2 py-1 w-full">
-              <option :value="null">Не выбрано</option>
-              <option v-if="enabledOptions.pikallo" value="pikallo">
-                Установка пиккало
-              </option>
-              <option v-if="enabledOptions.drilling" value="drilling">
-                Сверление
-              </option>
-            </select>
-          </label>
-          <div v-if="drillType === 'drilling'" class="ml-4">
-            Кол-во отверстий:
-            <input
-              type="number"
-              min="1"
-              max="4"
-              v-model.number="holeCount"
-              class="border px-2 py-1 w-20"
-            />
-          </div>
-        </template>
-      </div>
-
-      <div v-if="correctionMessage" class="text-orange-600 italic text-sm">
-        {{ correctionMessage }}
-      </div>
     </div>
 
     <!-- Центральная колонка -->
@@ -126,10 +61,10 @@
             Печать ({{ printMode }}) × {{ result.sheetsNeeded }} листов:
             <strong>
               {{
-                (settings.print_price[printMode].find(
-                  (t) => result.sheetsNeeded <= t.to
-                )?.price ?? settings.print_price[printMode].at(-1)?.price) *
-                result.sheetsNeeded
+                getTierPrice(
+                  settings.print_price[printMode],
+                  result.sheetsNeeded
+                ) * result.sheetsNeeded
               }}
               ₽
             </strong>
@@ -148,30 +83,16 @@
               {{ settings.lamination[laminationKey] * result.sheetsNeeded }} ₽
             </strong>
           </li>
-          <li v-if="useLamination">
-            Приладка ламинации:
-            <strong>{{ settings.lamination_setup_cost }} ₽</strong>
-          </li>
 
           <li v-if="useFoil">
             Фольгирование × {{ result.sheetsNeeded }}:
             <strong>{{ result.foilTotal.toFixed(2) }} ₽</strong>
           </li>
 
-          <li v-if="result.extras > 0">
-            Доп. опции:
-            <strong>{{ result.extras.toFixed(2) }} ₽</strong>
-          </li>
-
           <li>
             Резка:
             <strong>{{ result.cutting.toFixed(2) }} ₽</strong>
-            <span v-if="result.usePlotter" class="text-gray-500 italic"
-              >(плоттер)</span
-            >
-            <span v-else class="text-gray-500 italic"
-              >({{ settings.cutting_percentage }}%)</span
-            >
+            <span class="text-gray-500 italic">(плоттер)</span>
           </li>
 
           <li class="text-lg font-bold mt-3">
@@ -199,10 +120,10 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from "vue";
-import { useProductCalculator } from "~/composables/useProductCalculator";
+import { ref, computed } from "vue";
+import { useProductCalculator } from "~/composables/useFilmCalculator";
 import { useAddToCart } from "~/composables/useAddToCart";
-import settings from "~/assets/settings_print.json";
+import settings from "~/assets/settings_film.json";
 
 import ProductViews from "@/components/common/ProductViews.vue";
 import ProductOptions from "@/components/common/ProductOptions.vue";
@@ -214,6 +135,7 @@ const props = defineProps({
   icon: String,
   defaultValues: Object,
   enabledOptions: Object,
+  diameter: Number,
   previewComponent: [Object, Function],
   availableSizes: {
     type: Array,
@@ -224,24 +146,13 @@ const props = defineProps({
 const views = ref(props.defaultValues.views || [{ qty: 500 }]);
 const width = ref(props.defaultValues.width);
 const height = ref(props.defaultValues.height);
+const diameter = ref(props.defaultValues.diameter || null);
 const printMode = ref(props.defaultValues.printMode);
 const materialKey = ref(props.defaultValues.materialKey);
 const laminationKey = ref(props.defaultValues.laminationKey);
 const useLamination = ref(props.defaultValues.useLamination);
 const useFoil = ref(props.defaultValues.useFoil);
 const foilColor = ref(props.defaultValues.foilColor);
-
-const isComplexShape = ref(false);
-const useBending = ref(false);
-const bendingFolds = ref(1);
-const useRoundCorners = ref(false);
-const cornerCount = ref(4);
-const drillType = ref(null);
-const holeCount = ref(1);
-
-const savedMaterial = ref("");
-const savedLamination = ref("");
-const correctionMessage = ref("");
 
 const { addProduct } = useAddToCart();
 const calculate = useProductCalculator(settings);
@@ -252,6 +163,7 @@ const totalTirazh = computed(() =>
 
 const result = computed(() =>
   calculate({
+    diameter: diameter.value,
     width: width.value,
     height: height.value,
     views: views.value,
@@ -261,28 +173,9 @@ const result = computed(() =>
     useLamination: useLamination.value,
     useFoil: useFoil.value,
     foilColor: foilColor.value,
-    useBending: useBending.value,
-    bendingFolds: bendingFolds.value,
-    useRoundCorners: useRoundCorners.value,
-    cornerCount: cornerCount.value,
-    drillType: drillType.value,
-    holeCount: holeCount.value,
-    isComplexShape: isComplexShape.value,
     enabledOptions: props.enabledOptions,
   })
 );
-
-watch(useFoil, (newVal) => {
-  if (newVal) {
-    savedMaterial.value = materialKey.value;
-    savedLamination.value = laminationKey.value;
-    laminationKey.value = "Soft touch";
-    useLamination.value = true;
-  } else {
-    if (savedMaterial.value) materialKey.value = savedMaterial.value;
-    if (savedLamination.value) laminationKey.value = savedLamination.value;
-  }
-});
 
 const materialsWithStatus = computed(() =>
   Object.entries(settings.materials).map(([name, price]) => ({
@@ -296,17 +189,21 @@ const getTierPrice = (tiers, value) =>
   tiers.find((t) => value <= t.to)?.price ?? tiers.at(-1).price;
 
 const betterDeals = computed(() => {
-  const sizeWithMarginX = Number(width.value) + settings.sheet.margin * 2;
-  const sizeWithMarginY = Number(height.value) + settings.sheet.margin * 2;
-  const sizeWithMarginAltX = Number(height.value) + settings.sheet.margin * 2;
-  const sizeWithMarginAltY = Number(width.value) + settings.sheet.margin * 2;
+  const sizeWithMarginX =
+    Number(width.value) + settings.plotter_sheet.margin * 2;
+  const sizeWithMarginY =
+    Number(height.value) + settings.plotter_sheet.margin * 2;
+  const sizeWithMarginAltX =
+    Number(height.value) + settings.plotter_sheet.margin * 2;
+  const sizeWithMarginAltY =
+    Number(width.value) + settings.plotter_sheet.margin * 2;
 
   const fitNormal =
-    Math.floor(settings.sheet.width / sizeWithMarginX) *
-    Math.floor(settings.sheet.height / sizeWithMarginY);
+    Math.floor(settings.plotter_sheet.width / sizeWithMarginX) *
+    Math.floor(settings.plotter_sheet.height / sizeWithMarginY);
   const fitRotated =
-    Math.floor(settings.sheet.width / sizeWithMarginAltX) *
-    Math.floor(settings.sheet.height / sizeWithMarginAltY);
+    Math.floor(settings.plotter_sheet.width / sizeWithMarginAltX) *
+    Math.floor(settings.plotter_sheet.height / sizeWithMarginAltY);
   const itemsPerSheet = Math.max(fitNormal, fitRotated);
 
   if (!itemsPerSheet || itemsPerSheet === 0) return [];
@@ -381,17 +278,6 @@ const handleOrder = () => {
       Материал: materialKey.value,
       Ламинация: useLamination.value ? laminationKey.value : "без ламинации",
       Фольгирование: useFoil.value ? `Да, цвет: ${foilColor.value}` : "Нет",
-      Биговка: useBending.value ? `${bendingFolds.value} фальца` : "Нет",
-      "Скругление углов": useRoundCorners.value
-        ? `${cornerCount.value} угла`
-        : "Нет",
-      "Пиккало/Сверление":
-        drillType.value === "pikallo"
-          ? "Пиккало"
-          : drillType.value === "drilling"
-          ? `${holeCount.value} отверстий`
-          : "Нет",
-      "Сложная форма": isComplexShape.value ? "Да" : "Нет",
     },
     price: result.value.total,
   });

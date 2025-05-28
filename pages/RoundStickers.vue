@@ -1,10 +1,9 @@
 <script setup>
 import ProductCalculatorFilm from "@/components/ProductCalculatorFilm.vue";
-import StickerPreview from "@/components/products/LeafletsPreview.vue";
+import RoundStickersPreview from "@/components/products/LeafletsPreview.vue";
 
 const defaultValues = {
-  width: 70,
-  height: 100,
+  diameter: 50,
   views: [{ qty: 500 }],
   printMode: "4+0",
   materialKey: "Пленка Muflon 80г/м² глянцевая",
@@ -23,16 +22,17 @@ const enabledOptions = {
   foil: true,
 };
 
-const availableSizes = [];
+const availableSizes = []; // предустановленные диаметры, если есть
 </script>
 
 <template>
   <ProductCalculatorFilm
-    title="Наклейки на плёнке"
-    icon="/icons/sticker.svg"
+    title="Круглые наклейки на плёнке"
+    icon="/icons/round-sticker.svg"
     :defaultValues="defaultValues"
     :enabledOptions="enabledOptions"
     :availableSizes="availableSizes"
-    :previewComponent="StickerPreview"
+    :previewComponent="RoundStickersPreview"
+    :diameter="defaultValues.diameter"
   />
 </template>
