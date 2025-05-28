@@ -120,7 +120,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { useProductCalculator } from "~/composables/useFilmCalculator";
 import { useAddToCart } from "~/composables/useAddToCart";
 import settings from "~/assets/settings_film.json";
@@ -153,6 +153,18 @@ const laminationKey = ref(props.defaultValues.laminationKey);
 const useLamination = ref(props.defaultValues.useLamination);
 const useFoil = ref(props.defaultValues.useFoil);
 const foilColor = ref(props.defaultValues.foilColor);
+
+const savedLamination = ref("");
+
+watch(useFoil, (newVal) => {
+  if (newVal) {
+    savedLamination.value = laminationKey.value;
+    laminationKey.value = "Soft touch 30 мкр";
+    useLamination.value = true;
+  } else {
+    if (savedLamination.value) laminationKey.value = savedLamination.value;
+  }
+});
 
 const { addProduct } = useAddToCart();
 const calculate = useProductCalculator(settings);
