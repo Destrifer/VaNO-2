@@ -268,12 +268,17 @@ const applyDeal = (deal) => {
 };
 
 const handleOrder = () => {
+  const size =
+    typeof diameter?.value === "number" && !isNaN(diameter.value)
+      ? `${diameter.value} мм`
+      : `${width.value}×${height.value} мм`;
+
   addProduct({
     title: props.title,
     icon: props.icon || "/icons/default.svg",
     options: {
       Тираж: views.value.map((view) => view.qty),
-      Размер: `${width.value}×${height.value} мм`,
+      Размер: size,
       Печать: printMode.value,
       Материал: materialKey.value,
       Ламинация: useLamination.value ? laminationKey.value : "без ламинации",
