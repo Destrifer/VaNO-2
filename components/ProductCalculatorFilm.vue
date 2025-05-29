@@ -33,6 +33,14 @@
         :foilColor="foilColor"
         @update:foilColor="(val) => (foilColor = val)"
       />
+
+      <div class="space-y-2">
+        <label class="block text-sm font-medium">Тип резки:</label>
+        <select v-model="cutType" class="w-full border rounded p-2">
+          <option value="standard">С надсечкой (по умолчанию)</option>
+          <option value="individual">Поштучная резка (+50%)</option>
+        </select>
+      </div>
     </div>
 
     <!-- Центральная колонка -->
@@ -91,7 +99,9 @@
           </li>
 
           <li>
-            Резка:
+            Резка ({{
+              cutType === "individual" ? "поштучная" : "с надсечкой"
+            }}):
             <strong>{{ result.cutting.toFixed(2) }} ₽</strong>
             <span class="text-gray-500 italic">(плоттер)</span>
           </li>
@@ -154,6 +164,7 @@ const laminationKey = ref(props.defaultValues.laminationKey);
 const useLamination = ref(props.defaultValues.useLamination);
 const useFoil = ref(props.defaultValues.useFoil);
 const foilColor = ref(props.defaultValues.foilColor);
+const cutType = ref("standard");
 
 const savedLamination = ref("");
 
@@ -186,6 +197,7 @@ const result = computed(() =>
     useLamination: useLamination.value,
     useFoil: useFoil.value,
     foilColor: foilColor.value,
+    cuttingType: cutType.value,
     enabledOptions: props.enabledOptions,
   })
 );
@@ -296,6 +308,7 @@ const handleOrder = () => {
       Материал: materialKey.value,
       Ламинация: useLamination.value ? laminationKey.value : "без ламинации",
       Фольгирование: useFoil.value ? `Да, цвет: ${foilColor.value}` : "Нет",
+      Резка: cutType.value === "individual" ? "Поштучная" : "С надсечкой",
     },
     price: result.value.total,
   });

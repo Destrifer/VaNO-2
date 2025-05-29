@@ -14,6 +14,7 @@ export function useProductCalculator(settings) {
       useLamination,
       useFoil,
       foilColor,
+      cuttingType = "standard", // стандартная (с надсечкой) по умолчанию
     } = config;
 
     const totalTirazh = views.reduce(
@@ -24,7 +25,6 @@ export function useProductCalculator(settings) {
     const usePlotter = true;
     const sheet = usePlotter ? settings.plotter_sheet : settings.sheet;
 
-    // Используем диаметр, если он задан, иначе width и height
     const w = diameter || width;
     const h = diameter || height;
 
@@ -60,11 +60,13 @@ export function useProductCalculator(settings) {
     const subtotal = sheetsNeeded * unitPrice;
     const foilTotal = foil * sheetsNeeded;
 
-    // Резка всегда по таблице plotter_cutting_price
-    const cutting =
+    let cutting =
       getTierPrice(settings.plotter_cutting_price, sheetsNeeded) * sheetsNeeded;
 
-    // Доп. опции не используются в наклейках
+    if (cuttingType === "individual") {
+      cutting *= 1.5;
+    }
+
     const extras = 0;
 
     return {
