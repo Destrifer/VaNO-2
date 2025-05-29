@@ -29,7 +29,7 @@ const availableSizes = [];
 <template>
   <ProductCalculatorFilm
     title="Наклейки на плёнке"
-    icon="/icons/sticker.svg"
+    icon="/icons/stickers.svg"
     :defaultValues="defaultValues"
     :enabledOptions="enabledOptions"
     :availableSizes="availableSizes"

@@ -28,7 +28,7 @@ const availableSizes = []; // предустановленные диаметр�
 <template>
   <ProductCalculatorFilm
     title="Круглые наклейки на плёнке"
-    icon="/icons/round-sticker.svg"
+    icon="/icons/stickers.svg"
     :defaultValues="defaultValues"
     :enabledOptions="enabledOptions"
     :availableSizes="availableSizes"
