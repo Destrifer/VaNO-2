@@ -1,4 +1,4 @@
-export function useProductCalculator(settings) {
+export function useFilmCalculator(settings) {
   const getTierPrice = (tiers, value) =>
     tiers.find((t) => value <= t.to)?.price ?? tiers.at(-1)?.price ?? 0;
 

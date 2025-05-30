@@ -132,7 +132,7 @@
 
 <script setup>
 import { ref, computed, watch } from "vue";
-import { useProductCalculator } from "~/composables/useFilmCalculator";
+import { useFilmCalculator } from "~/composables/useFilmCalculator";
 import { useAddToCart } from "~/composables/useAddToCart";
 import settings from "~/assets/settings_film.json";
 
@@ -179,7 +179,7 @@ watch(useFoil, (newVal) => {
 });
 
 const { addProduct } = useAddToCart();
-const calculate = useProductCalculator(settings);
+const calculate = useFilmCalculator(settings);
 
 const totalTirazh = computed(() =>
   views.value.reduce((sum, view) => sum + (Number(view.qty) || 0), 0)
