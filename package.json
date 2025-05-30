@@ -35,5 +35,8 @@
     "vue-imask": "^7.6.1",
     "vue-router": "^4.5.0",
     "vue3-toastify": "^0.2.8"
+  },
+  "devDependencies": {
+    "@iconify-json/f7": "^1.2.2"
   }
 }
