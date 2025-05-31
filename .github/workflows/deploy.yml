@@ -23,6 +23,11 @@ jobs:
       - name: Generate static site
         run: npx nuxi generate
 
+      - name: Generate Brotli compressed assets
+        run: |
+          npm install -g brotli
+          find .output/public -type f \( -iname "*.js" -o -iname "*.css" -o -iname "*.html" \) -exec brotli --best --keep {} \;
+
       - name: Copy files to server
         uses: appleboy/scp-action@v0.1.4
         with:
