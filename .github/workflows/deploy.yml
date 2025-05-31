@@ -1,0 +1,42 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate static site
+        run: npx nuxi generate
+
+      - name: Copy files to server
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.NUXT_DEPLOY_HOST }}
+          username: ${{ secrets.NUXT_DEPLOY_USER }}
+          key: ${{ secrets.NUXT_DEPLOY_KEY }}
+          source: ".output/public/*"
+          target: "/home/nuxt/site/output"
+
+      - name: Restart container
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.NUXT_DEPLOY_HOST }}
+          username: ${{ secrets.NUXT_DEPLOY_USER }}
+          key: ${{ secrets.NUXT_DEPLOY_KEY }}
+          script: |
+            docker restart nuxt-site
