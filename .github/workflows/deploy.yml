@@ -40,3 +40,4 @@ jobs:
           key: ${{ secrets.NUXT_DEPLOY_KEY }}
           script: |
             docker restart nuxt-site
+          debug: true
