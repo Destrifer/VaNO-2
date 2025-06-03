@@ -37,6 +37,11 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  pages: Number,
+  showPages: {
+    type: Boolean,
+    default: false,
+  },
   printOptions: {
     type: Array,
     default: () => ["4+0", "4+4"],
@@ -54,6 +59,7 @@ const emit = defineEmits([
   "update:foilColor",
   "update:printMode",
   "update:isComplexShape",
+  "update:pages",
 ]);
 
 const materialProxy = ref(props.material);
@@ -63,7 +69,7 @@ const useLaminationProxy = ref(props.useLamination);
 const useFoilProxy = ref(props.useFoil);
 const foilColorProxy = ref(props.foilColor);
 const isComplexShapeProxy = ref(props.isComplexShape);
-
+const pagesProxy = ref(props.pages);
 const selectedFormat = ref("Custom");
 
 watch(
@@ -94,7 +100,11 @@ watch(
   () => props.isComplexShape,
   (val) => (isComplexShapeProxy.value = val)
 );
-
+watch(
+  () => props.pages,
+  (val) => (pagesProxy.value = val)
+);
+watch(pagesProxy, (val) => emit("update:pages", val));
 watch(materialProxy, (val) => emit("update:material", val));
 watch(laminationProxy, (val) => emit("update:lamination", val));
 watch(printModeProxy, (val) => emit("update:printMode", val));
@@ -138,6 +148,25 @@ watch(selectedFormat, (val) => {
           :value="diameter"
           @input="emit('update:diameter', +$event.target.value)"
         />
+      </label>
+    </template>
+
+    <template v-if="showPages">
+      <label class="block">
+        Кол-во страниц:
+        <div class="mt-1 flex items-center gap-4">
+          <input
+            type="range"
+            min="4"
+            max="300"
+            step="4"
+            v-model.number="pagesProxy"
+            class="w-full"
+          />
+          <span class="min-w-[40px] text-sm text-gray-700">
+            {{ pagesProxy }}
+          </span>
+        </div>
       </label>
     </template>
 

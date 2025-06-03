@@ -31,7 +31,7 @@ const printMode = ref(props.defaultValues.printMode);
 const materialKey = ref(props.defaultValues.materialKey);
 const laminationKey = ref(props.defaultValues.laminationKey);
 const useLamination = ref(props.defaultValues.useLamination);
-
+const pages = ref(48); // значение по умолчанию
 const useBending = ref(false);
 const bendingFolds = ref(1);
 const useRoundCorners = ref(false);
@@ -63,6 +63,7 @@ const result = computed(() =>
     drillType: drillType.value,
     holeCount: holeCount.value,
     enabledOptions: props.enabledOptions,
+    pages: pages.value,
   })
 );
 
@@ -136,6 +137,9 @@ const handleOrder = () => {
         :availableSizes="availableSizes"
         :sizes="settings.sizes"
         :allowCustomSize="allowCustomSize"
+        :showPages="true"
+        :pages="pages"
+        @update:pages="(val) => (pages = val)"
       />
 
       <!-- Доп. опции -->

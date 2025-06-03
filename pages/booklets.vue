@@ -12,6 +12,7 @@ const defaultValues = {
   materialKey: "Мелованная матовая 150 гр.",
   laminationKey: "Глянцевая 30 мкм",
   useLamination: true,
+  pages: 48, // ← Добавлено
 };
 
 // Включённые опции
