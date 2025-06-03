@@ -32,6 +32,7 @@ const materialKey = ref(props.defaultValues.materialKey);
 const laminationKey = ref(props.defaultValues.laminationKey);
 const useLamination = ref(props.defaultValues.useLamination);
 const pages = ref(props.defaultValues.pages || 48);
+const materialBlockKey = ref(Object.keys(settings.materials)[0]);
 const useBending = ref(false);
 const bendingFolds = ref(1);
 const useRoundCorners = ref(false);
@@ -58,6 +59,7 @@ const result = computed(() =>
     height: height.value,
     views: views.value,
     materialKey: materialKey.value,
+    materialBlockKey: materialBlockKey.value,
     laminationKey: laminationKey.value,
     printMode: printMode.value,
     useLamination: useLamination.value,
@@ -80,9 +82,7 @@ const materialsWithStatus = computed(() =>
   }))
 );
 
-const betterDeals = computed(() => {
-  return [];
-});
+const betterDeals = computed(() => []);
 
 const applyDeal = (deal) => {
   const multiplier = deal.neededTirazh / totalTirazh.value;
@@ -101,6 +101,7 @@ const handleOrder = () => {
       Страниц: pages.value,
       Печать: printMode.value,
       Материал: materialKey.value,
+      "Материал блока": materialBlockKey.value,
       Ламинация: useLamination.value ? laminationKey.value : "без ламинации",
       Биговка: useBending.value ? `${bendingFolds.value} фальца` : "Нет",
       "Скругление углов": useRoundCorners.value
@@ -145,6 +146,25 @@ const handleOrder = () => {
         :pages="pages"
         @update:pages="(val) => (pages = val)"
       />
+
+      <div class="space-y-2">
+        <label class="block">
+          Материал блока:
+          <select
+            class="mt-1 border px-2 py-1 w-full"
+            v-model="materialBlockKey"
+          >
+            <option
+              v-for="item in materialsWithStatus"
+              :key="item.name"
+              :value="item.name"
+              :disabled="item.disabled"
+            >
+              {{ item.name }}
+            </option>
+          </select>
+        </label>
+      </div>
 
       <div class="space-y-2">
         <template v-if="enabledOptions.bending">
@@ -229,31 +249,36 @@ const handleOrder = () => {
           <li>
             Страниц в брошюре: <strong>{{ pages }}</strong>
           </li>
-          <li>
-            Изделий на листе: <strong>{{ result.itemsPerSheet }}</strong>
-          </li>
-          <li>
-            Листов нужно: <strong>{{ result.sheetsNeeded }}</strong>
-          </li>
 
-          <li class="mt-2 font-semibold">Стоимость по шагам:</li>
-
+          <li class="font-semibold mt-2">Обложка:</li>
           <li>
-            Печать ({{ printMode }}) × {{ result.sheetsNeeded }}:
-            <strong>{{ result.printTotal.toFixed(2) }} ₽</strong>
+            Печать ({{ printMode }}) × {{ result.cover.sheetsNeeded }}:
+            <strong>{{ result.cover.printTotal.toFixed(2) }} ₽</strong>
           </li>
           <li>
-            Материал × {{ result.sheetsNeeded }}:
-            <strong>{{ result.materialTotal.toFixed(2) }} ₽</strong>
+            Материал × {{ result.cover.sheetsNeeded }}:
+            <strong>{{ result.cover.materialTotal.toFixed(2) }} ₽</strong>
           </li>
           <li v-if="useLamination">
-            Ламинация × {{ result.sheetsNeeded }}:
-            <strong>{{ result.laminationTotal.toFixed(2) }} ₽</strong>
+            Ламинация × {{ result.cover.sheetsNeeded }}:
+            <strong>{{ result.cover.laminationTotal.toFixed(2) }} ₽</strong>
           </li>
+
+          <li class="font-semibold mt-2">Блок:</li>
+          <li>
+            Печать (4+4) × {{ result.block.sheetsNeeded }}:
+            <strong>{{ result.block.printTotal.toFixed(2) }} ₽</strong>
+          </li>
+          <li>
+            Материал × {{ result.block.sheetsNeeded }}:
+            <strong>{{ result.block.materialTotal.toFixed(2) }} ₽</strong>
+          </li>
+
           <li v-if="useLamination">
             Приладка ламинации:
             <strong>{{ settings.lamination_setup_cost }} ₽</strong>
           </li>
+
           <li v-if="result.extras > 0">
             Доп. опции:
             <strong>{{ result.extras.toFixed(2) }} ₽</strong>

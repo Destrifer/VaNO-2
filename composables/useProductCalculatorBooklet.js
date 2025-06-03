@@ -7,7 +7,8 @@ export function useProductCalculatorBooklet(settings) {
       width,
       height,
       views,
-      materialKey,
+      materialKey, // для обложки
+      materialBlockKey, // для блока
       laminationKey,
       printMode,
       useLamination,
@@ -25,19 +26,14 @@ export function useProductCalculatorBooklet(settings) {
       (sum, view) => sum + (Number(view.qty) || 0),
       0
     );
-
     const adjustedTirazh =
       totalTirazh + Math.max(2, Math.ceil(totalTirazh * 0.05));
 
-    const totalPages = adjustedTirazh * pages;
-
     const sheet = settings.sheet;
 
-    // Размер брошюры в развернутом виде (ширина и высота меняются местами)
     const spreadWidth = height + sheet.margin * 2;
     const spreadHeight = width + sheet.margin * 2;
 
-    // Сколько разворотов помещается на один печатный лист
     const fitNormal =
       Math.floor(sheet.width / spreadWidth) *
       Math.floor(sheet.height / spreadHeight);
@@ -46,32 +42,52 @@ export function useProductCalculatorBooklet(settings) {
       Math.floor(sheet.height / spreadWidth);
 
     const spreadsPerSheet = Math.max(fitNormal, fitRotated);
-
     if (!spreadsPerSheet || spreadsPerSheet === 0) return { total: 0 };
 
-    // Разворотов на всю партию
-    const spreadsTotal = Math.ceil(totalPages / 2); // 1 разворот = 2 страницы
-    const sheetsNeeded = Math.ceil(spreadsTotal / spreadsPerSheet);
+    // === 📘 Блок (внутренний) ===
+    const blockSpreadsPerBooklet = Math.ceil(pages / 2); // 2 стр на разворот
+    const blockTotalSpreads = adjustedTirazh * blockSpreadsPerBooklet;
+    const blockSheetsNeeded = Math.ceil(blockTotalSpreads / spreadsPerSheet);
 
-    const material = settings.materials[materialKey] ?? 0;
-    const laminationPerSheet = useLamination
-      ? settings.lamination[laminationKey] ?? 0
-      : 0;
-    const laminationSetup = useLamination ? settings.lamination_setup_cost : 0;
-
-    const printPerSheet = getTierPrice(
-      settings.print_price[printMode],
-      sheetsNeeded
+    const blockMaterial = settings.materials[materialBlockKey] ?? 0;
+    const blockPrintPerSheet = getTierPrice(
+      settings.print_price["4+4"],
+      blockSheetsNeeded
     );
 
-    const printTotal = printPerSheet * sheetsNeeded;
-    const materialTotal = material * sheetsNeeded;
-    const laminationTotal = laminationPerSheet * sheetsNeeded;
+    const blockPrintTotal = blockPrintPerSheet * blockSheetsNeeded;
+    const blockMaterialTotal = blockMaterial * blockSheetsNeeded;
+    const blockSubtotal = blockPrintTotal + blockMaterialTotal;
 
-    const subtotal = printTotal + materialTotal + laminationTotal;
+    // === 📕 Обложка ===
+    const coverSpreadsTotal = adjustedTirazh; // один разворот на брошюру
+    const coverSheetsNeeded = Math.ceil(coverSpreadsTotal / spreadsPerSheet);
+
+    const coverMaterial = settings.materials[materialKey] ?? 0;
+    const coverLamination = useLamination
+      ? settings.lamination[laminationKey] ?? 0
+      : 0;
+    const coverLaminationSetup = useLamination
+      ? settings.lamination_setup_cost
+      : 0;
+
+    const coverPrintPerSheet = getTierPrice(
+      settings.print_price[printMode],
+      coverSheetsNeeded
+    );
+
+    const coverPrintTotal = coverPrintPerSheet * coverSheetsNeeded;
+    const coverMaterialTotal = coverMaterial * coverSheetsNeeded;
+    const coverLaminationTotal = coverLamination * coverSheetsNeeded;
+
+    const coverSubtotal =
+      coverPrintTotal + coverMaterialTotal + coverLaminationTotal;
+
+    // === ✂ Общие доп. затраты
+    const subtotal = blockSubtotal + coverSubtotal;
     const cutting = subtotal * (settings.cutting_percentage / 100);
 
-    let extras = laminationSetup;
+    let extras = coverLaminationSetup;
 
     if (
       useBending &&
@@ -113,11 +129,21 @@ export function useProductCalculatorBooklet(settings) {
 
     return {
       spreadsPerSheet,
-      spreadsTotal,
-      sheetsNeeded,
-      printTotal,
-      materialTotal,
-      laminationTotal,
+      block: {
+        spreadsTotal: blockTotalSpreads,
+        sheetsNeeded: blockSheetsNeeded,
+        printTotal: blockPrintTotal,
+        materialTotal: blockMaterialTotal,
+        subtotal: blockSubtotal,
+      },
+      cover: {
+        spreadsTotal: coverSpreadsTotal,
+        sheetsNeeded: coverSheetsNeeded,
+        printTotal: coverPrintTotal,
+        materialTotal: coverMaterialTotal,
+        laminationTotal: coverLaminationTotal,
+        subtotal: coverSubtotal,
+      },
       cutting,
       extras,
       total,
