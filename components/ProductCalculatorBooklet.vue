@@ -1,0 +1,271 @@
+<script setup>
+import { ref, computed } from "vue";
+import { useProductCalculatorBooklet } from "~/composables/useProductCalculatorBooklet";
+import { useAddToCart } from "~/composables/useAddToCart";
+import settings from "~/assets/settings_print.json";
+
+import ProductViews from "@/components/common/ProductViews.vue";
+import ProductOptions from "@/components/common/ProductOptions.vue";
+import BetterDeals from "@/components/common/BetterDeals.vue";
+
+const props = defineProps({
+  title: String,
+  icon: String,
+  defaultValues: Object,
+  enabledOptions: Object,
+  previewComponent: [Object, Function],
+  availableSizes: {
+    type: Array,
+    default: () => [],
+  },
+});
+
+const views = ref(props.defaultValues.views || [{ qty: 500 }]);
+const width = ref(props.defaultValues.width);
+const height = ref(props.defaultValues.height);
+const printMode = ref(props.defaultValues.printMode);
+const materialKey = ref(props.defaultValues.materialKey);
+const laminationKey = ref(props.defaultValues.laminationKey);
+const useLamination = ref(props.defaultValues.useLamination);
+
+const useBending = ref(false);
+const bendingFolds = ref(1);
+const useRoundCorners = ref(false);
+const cornerCount = ref(4);
+const drillType = ref(null);
+const holeCount = ref(1);
+const correctionMessage = ref("");
+
+const { addProduct } = useAddToCart();
+const calculate = useProductCalculatorBooklet(settings);
+
+const totalTirazh = computed(() =>
+  views.value.reduce((sum, view) => sum + (Number(view.qty) || 0), 0)
+);
+
+const result = computed(() =>
+  calculate({
+    width: width.value,
+    height: height.value,
+    views: views.value,
+    materialKey: materialKey.value,
+    laminationKey: laminationKey.value,
+    printMode: printMode.value,
+    useLamination: useLamination.value,
+    useBending: useBending.value,
+    bendingFolds: bendingFolds.value,
+    useRoundCorners: useRoundCorners.value,
+    cornerCount: cornerCount.value,
+    drillType: drillType.value,
+    holeCount: holeCount.value,
+    enabledOptions: props.enabledOptions,
+  })
+);
+
+const materialsWithStatus = computed(() =>
+  Object.entries(settings.materials).map(([name, price]) => ({
+    name,
+    price,
+    disabled: false,
+  }))
+);
+
+const betterDeals = computed(() => {
+  // Реализация аналогична предыдущей: для упрощения пока можно пропустить или скопировать
+  return [];
+});
+
+const applyDeal = (deal) => {
+  const multiplier = deal.neededTirazh / totalTirazh.value;
+  views.value.forEach((view) => {
+    view.qty = Math.ceil(view.qty * multiplier);
+  });
+};
+
+const handleOrder = () => {
+  addProduct({
+    title: props.title,
+    icon: props.icon || "/icons/default.svg",
+    options: {
+      Тираж: views.value.map((view) => view.qty),
+      Размер: `${width.value}×${height.value} мм`,
+      Печать: printMode.value,
+      Материал: materialKey.value,
+      Ламинация: useLamination.value ? laminationKey.value : "без ламинации",
+      Биговка: useBending.value ? `${bendingFolds.value} фальца` : "Нет",
+      "Скругление углов": useRoundCorners.value
+        ? `${cornerCount.value} угла`
+        : "Нет",
+      "Пиккало/Сверление":
+        drillType.value === "pikallo"
+          ? "Пиккало"
+          : drillType.value === "drilling"
+          ? `${holeCount.value} отверстий`
+          : "Нет",
+    },
+    price: result.value.total,
+  });
+};
+</script>
+
+<template>
+  <div class="mx-auto p-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+    <!-- Левая колонка -->
+    <div class="space-y-6">
+      <h1 class="text-2xl font-bold">Калькулятор {{ title.toLowerCase() }}</h1>
+
+      <ProductViews v-model="views" />
+
+      <ProductOptions
+        :width="width"
+        :height="height"
+        v-model:material="materialKey"
+        v-model:lamination="laminationKey"
+        v-model:useLamination="useLamination"
+        :materials="materialsWithStatus"
+        :laminations="settings.lamination"
+        @update:width="(val) => (width = val)"
+        @update:height="(val) => (height = val)"
+        :printMode="printMode"
+        @update:printMode="(val) => (printMode = val)"
+        :enabledOptions="enabledOptions"
+        :availableSizes="availableSizes"
+        :sizes="settings.sizes"
+      />
+
+      <!-- Доп. опции -->
+      <div class="space-y-2">
+        <template v-if="enabledOptions.bending">
+          <label class="flex items-center gap-2">
+            <input type="checkbox" v-model="useBending" />
+            Биговка
+          </label>
+          <div v-if="useBending" class="ml-4">
+            Кол-во фальцев:
+            <input
+              type="number"
+              min="1"
+              max="2"
+              v-model.number="bendingFolds"
+              class="border px-2 py-1 w-20"
+            />
+          </div>
+        </template>
+
+        <template v-if="enabledOptions.round_corners">
+          <label class="flex items-center gap-2">
+            <input type="checkbox" v-model="useRoundCorners" />
+            Скругление уголков
+          </label>
+          <div v-if="useRoundCorners" class="ml-4">
+            Кол-во углов:
+            <input
+              type="number"
+              min="1"
+              max="4"
+              v-model.number="cornerCount"
+              class="border px-2 py-1 w-20"
+            />
+          </div>
+        </template>
+
+        <template v-if="enabledOptions.pikallo || enabledOptions.drilling">
+          <label class="block">
+            Пиккало / Сверление:
+            <select v-model="drillType" class="mt-1 border px-2 py-1 w-full">
+              <option :value="null">Не выбрано</option>
+              <option v-if="enabledOptions.pikallo" value="pikallo">
+                Установка пиккало
+              </option>
+              <option v-if="enabledOptions.drilling" value="drilling">
+                Сверление
+              </option>
+            </select>
+          </label>
+          <div v-if="drillType === 'drilling'" class="ml-4">
+            Кол-во отверстий:
+            <input
+              type="number"
+              min="1"
+              max="4"
+              v-model.number="holeCount"
+              class="border px-2 py-1 w-20"
+            />
+          </div>
+        </template>
+      </div>
+
+      <div v-if="correctionMessage" class="text-orange-600 italic text-sm">
+        {{ correctionMessage }}
+      </div>
+    </div>
+
+    <!-- Центральная колонка -->
+    <div class="flex flex-col items-center space-y-6">
+      <component :is="previewComponent" :width="width" :height="height" />
+      <BetterDeals :better-deals="betterDeals" @select-deal="applyDeal" />
+    </div>
+
+    <!-- Правая колонка -->
+    <div class="space-y-6">
+      <div class="border-t pt-6">
+        <h2 class="text-xl font-semibold mb-2">Итог заказа:</h2>
+        <ul class="space-y-1 text-sm">
+          <li>
+            Тираж: <strong>{{ totalTirazh }}</strong>
+          </li>
+          <li>
+            Изделий на листе: <strong>{{ result.itemsPerSheet }}</strong>
+          </li>
+          <li>
+            Листов нужно: <strong>{{ result.sheetsNeeded }}</strong>
+          </li>
+
+          <li class="mt-2 font-semibold">Стоимость по шагам:</li>
+
+          <li>
+            Печать ({{ printMode }}) × {{ result.sheetsNeeded }}:
+            <strong>{{ result.printTotal.toFixed(2) }} ₽</strong>
+          </li>
+          <li>
+            Материал × {{ result.sheetsNeeded }}:
+            <strong>{{ result.materialTotal.toFixed(2) }} ₽</strong>
+          </li>
+          <li v-if="useLamination">
+            Ламинация × {{ result.sheetsNeeded }}:
+            <strong>{{ result.laminationTotal.toFixed(2) }} ₽</strong>
+          </li>
+          <li v-if="useLamination">
+            Приладка ламинации:
+            <strong>{{ settings.lamination_setup_cost }} ₽</strong>
+          </li>
+          <li v-if="result.extras > 0">
+            Доп. опции:
+            <strong>{{ result.extras.toFixed(2) }} ₽</strong>
+          </li>
+          <li>
+            Резка:
+            <strong>{{ result.cutting.toFixed(2) }} ₽</strong>
+          </li>
+          <li class="text-lg font-bold mt-3">
+            Общая сумма:
+            <span class="text-green-600">{{ result.total.toFixed(2) }} ₽</span>
+          </li>
+          <li>
+            Цена за штуку:
+            <strong class="text-blue-600">
+              {{ (result.total / totalTirazh).toFixed(2) }} ₽
+            </strong>
+          </li>
+        </ul>
+      </div>
+
+      <button
+        @click="handleOrder"
+        class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow"
+      >
+        Заказать
+      </button>
+    </div>
+  </div>
+</template>
