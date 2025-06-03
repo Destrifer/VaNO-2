@@ -151,25 +151,6 @@ watch(selectedFormat, (val) => {
       </label>
     </template>
 
-    <template v-if="showPages">
-      <label class="block">
-        Кол-во страниц:
-        <div class="mt-1 flex items-center gap-4">
-          <input
-            type="range"
-            min="4"
-            max="300"
-            step="4"
-            v-model.number="pagesProxy"
-            class="w-full"
-          />
-          <span class="min-w-[40px] text-sm text-gray-700">
-            {{ pagesProxy }}
-          </span>
-        </div>
-      </label>
-    </template>
-
     <template v-else>
       <label class="block" v-if="availableSizes.length">
         Формат:
@@ -180,6 +161,20 @@ watch(selectedFormat, (val) => {
           <option v-if="allowCustomSize" value="Custom">Свой размер</option>
         </select>
       </label>
+
+      <template v-if="showPages">
+        <label class="block">
+          Количество страниц: {{ pagesProxy }}
+          <input
+            type="range"
+            class="w-full"
+            min="4"
+            max="300"
+            step="4"
+            v-model="pagesProxy"
+          />
+        </label>
+      </template>
 
       <label v-if="showComplexShape" class="block text-sm">
         <input type="checkbox" v-model="isComplexShapeProxy" class="mr-2" />
