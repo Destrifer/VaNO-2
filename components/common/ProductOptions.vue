@@ -33,6 +33,10 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  allowCustomSize: {
+    type: Boolean,
+    default: true,
+  },
   printOptions: {
     type: Array,
     default: () => ["4+0", "4+4"],
@@ -144,7 +148,7 @@ watch(selectedFormat, (val) => {
           <option v-for="key in availableSizes" :key="key" :value="key">
             {{ key }}
           </option>
-          <option value="Custom">Свой размер</option>
+          <option v-if="allowCustomSize" value="Custom">Свой размер</option>
         </select>
       </label>
 

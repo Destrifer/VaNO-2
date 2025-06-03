@@ -24,11 +24,7 @@ const enabledOptions = {
 };
 
 // Предустановленные размеры
-const availableSizes = [
-  "A4 (210×297 мм)",
-  "A5 (148×210 мм)",
-  "A6 (105×148 мм)",
-];
+const availableSizes = ["A4 (210×297 мм)", "A5 (148×210 мм)"];
 </script>
 
 <template>
@@ -39,5 +35,6 @@ const availableSizes = [
     :enabledOptions="enabledOptions"
     :availableSizes="availableSizes"
     :previewComponent="BookletPreview"
+    :allowCustomSize="false"
   />
 </template>

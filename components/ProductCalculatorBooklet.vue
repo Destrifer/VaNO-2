@@ -18,6 +18,10 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  allowCustomSize: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const views = ref(props.defaultValues.views || [{ qty: 500 }]);
@@ -131,6 +135,7 @@ const handleOrder = () => {
         :enabledOptions="enabledOptions"
         :availableSizes="availableSizes"
         :sizes="settings.sizes"
+        :allowCustomSize="allowCustomSize"
       />
 
       <!-- Доп. опции -->
