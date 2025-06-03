@@ -18,6 +18,7 @@ export function useProductCalculatorBooklet(settings) {
       drillType,
       holeCount,
       enabledOptions = {},
+      pages = 0,
     } = config;
 
     const totalTirazh = views.reduce(
@@ -25,25 +26,32 @@ export function useProductCalculatorBooklet(settings) {
       0
     );
 
+    const adjustedTirazh =
+      totalTirazh + Math.max(2, Math.ceil(totalTirazh * 0.05));
+
+    const totalPages = adjustedTirazh * pages;
+
     const sheet = settings.sheet;
 
-    const sizeWithMarginX = Number(width) + sheet.margin * 2;
-    const sizeWithMarginY = Number(height) + sheet.margin * 2;
-    const sizeWithMarginAltX = Number(height) + sheet.margin * 2;
-    const sizeWithMarginAltY = Number(width) + sheet.margin * 2;
+    // Размер брошюры в развернутом виде (ширина и высота меняются местами)
+    const spreadWidth = height + sheet.margin * 2;
+    const spreadHeight = width + sheet.margin * 2;
 
+    // Сколько разворотов помещается на один печатный лист
     const fitNormal =
-      Math.floor(sheet.width / sizeWithMarginX) *
-      Math.floor(sheet.height / sizeWithMarginY);
+      Math.floor(sheet.width / spreadWidth) *
+      Math.floor(sheet.height / spreadHeight);
     const fitRotated =
-      Math.floor(sheet.width / sizeWithMarginAltX) *
-      Math.floor(sheet.height / sizeWithMarginAltY);
+      Math.floor(sheet.width / spreadHeight) *
+      Math.floor(sheet.height / spreadWidth);
 
-    const itemsPerSheet = Math.max(fitNormal, fitRotated);
+    const spreadsPerSheet = Math.max(fitNormal, fitRotated);
 
-    if (!itemsPerSheet || itemsPerSheet === 0) return { total: 0 };
+    if (!spreadsPerSheet || spreadsPerSheet === 0) return { total: 0 };
 
-    const sheetsNeeded = Math.ceil(totalTirazh / itemsPerSheet);
+    // Разворотов на всю партию
+    const spreadsTotal = Math.ceil(totalPages / 2); // 1 разворот = 2 страницы
+    const sheetsNeeded = Math.ceil(spreadsTotal / spreadsPerSheet);
 
     const material = settings.materials[materialKey] ?? 0;
     const laminationPerSheet = useLamination
@@ -61,11 +69,8 @@ export function useProductCalculatorBooklet(settings) {
     const laminationTotal = laminationPerSheet * sheetsNeeded;
 
     const subtotal = printTotal + materialTotal + laminationTotal;
-
-    // ✂ Резка
     const cutting = subtotal * (settings.cutting_percentage / 100);
 
-    // ➕ Доп. опции
     let extras = laminationSetup;
 
     if (
@@ -107,7 +112,8 @@ export function useProductCalculatorBooklet(settings) {
     const total = subtotal + cutting + extras;
 
     return {
-      itemsPerSheet,
+      spreadsPerSheet,
+      spreadsTotal,
       sheetsNeeded,
       printTotal,
       materialTotal,

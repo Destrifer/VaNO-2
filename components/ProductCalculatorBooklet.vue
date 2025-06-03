@@ -31,7 +31,7 @@ const printMode = ref(props.defaultValues.printMode);
 const materialKey = ref(props.defaultValues.materialKey);
 const laminationKey = ref(props.defaultValues.laminationKey);
 const useLamination = ref(props.defaultValues.useLamination);
-const pages = ref(48); // значение по умолчанию
+const pages = ref(props.defaultValues.pages || 48);
 const useBending = ref(false);
 const bendingFolds = ref(1);
 const useRoundCorners = ref(false);
@@ -46,6 +46,11 @@ const calculate = useProductCalculatorBooklet(settings);
 const totalTirazh = computed(() =>
   views.value.reduce((sum, view) => sum + (Number(view.qty) || 0), 0)
 );
+
+const totalTirazhWithReserve = computed(() => {
+  const reserve = Math.max(Math.ceil(totalTirazh.value * 0.05), 2);
+  return totalTirazh.value + reserve;
+});
 
 const result = computed(() =>
   calculate({
@@ -76,7 +81,6 @@ const materialsWithStatus = computed(() =>
 );
 
 const betterDeals = computed(() => {
-  // Реализация аналогична предыдущей: для упрощения пока можно пропустить или скопировать
   return [];
 });
 
@@ -94,6 +98,7 @@ const handleOrder = () => {
     options: {
       Тираж: views.value.map((view) => view.qty),
       Размер: `${width.value}×${height.value} мм`,
+      Страниц: pages.value,
       Печать: printMode.value,
       Материал: materialKey.value,
       Ламинация: useLamination.value ? laminationKey.value : "без ламинации",
@@ -115,7 +120,6 @@ const handleOrder = () => {
 
 <template>
   <div class="mx-auto p-6 grid grid-cols-1 md:grid-cols-3 gap-8">
-    <!-- Левая колонка -->
     <div class="space-y-6">
       <h1 class="text-2xl font-bold">Калькулятор {{ title.toLowerCase() }}</h1>
 
@@ -142,7 +146,6 @@ const handleOrder = () => {
         @update:pages="(val) => (pages = val)"
       />
 
-      <!-- Доп. опции -->
       <div class="space-y-2">
         <template v-if="enabledOptions.bending">
           <label class="flex items-center gap-2">
@@ -209,19 +212,22 @@ const handleOrder = () => {
       </div>
     </div>
 
-    <!-- Центральная колонка -->
     <div class="flex flex-col items-center space-y-6">
       <component :is="previewComponent" :width="width" :height="height" />
       <BetterDeals :better-deals="betterDeals" @select-deal="applyDeal" />
     </div>
 
-    <!-- Правая колонка -->
     <div class="space-y-6">
       <div class="border-t pt-6">
         <h2 class="text-xl font-semibold mb-2">Итог заказа:</h2>
         <ul class="space-y-1 text-sm">
           <li>
-            Тираж: <strong>{{ totalTirazh }}</strong>
+            Тираж: <strong>{{ totalTirazh }}</strong> +
+            <strong>{{ Math.max(Math.ceil(totalTirazh * 0.05), 2) }}</strong>
+            запас = <strong>{{ totalTirazhWithReserve }}</strong>
+          </li>
+          <li>
+            Страниц в брошюре: <strong>{{ pages }}</strong>
           </li>
           <li>
             Изделий на листе: <strong>{{ result.itemsPerSheet }}</strong>

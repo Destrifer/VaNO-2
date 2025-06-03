@@ -7,12 +7,12 @@ import settings from "@/assets/settings_print.json";
 const defaultValues = {
   width: 210,
   height: 297,
-  views: [{ qty: 100 }],
+  views: [{ qty: 20 }],
   printMode: "4+4",
   materialKey: "Мелованная матовая 150 гр.",
   laminationKey: "Глянцевая 30 мкм",
   useLamination: true,
-  pages: 48, // ← Добавлено
+  pages: 28, // ← Добавлено
 };
 
 // Включённые опции
