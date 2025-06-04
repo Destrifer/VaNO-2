@@ -84,7 +84,7 @@ export function useProductCalculatorBooklet(settings) {
 
     // === ✂ Общие доп. затраты
     const subtotal = blockSubtotal + coverSubtotal + bindingPrice;
-    const cutting = subtotal * (settings.cutting_percentage / 100);
+    const cutting = subtotal * (settings.cutting_percentage_booklet / 100);
 
     const extras = coverLaminationSetup;
 

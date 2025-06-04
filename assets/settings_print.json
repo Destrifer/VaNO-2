@@ -96,6 +96,7 @@
     "margin": 2
   },
   "cutting_percentage": 15,
+  "cutting_percentage_booklet": 3,
   "plotter_cutting_price": [
     { "to": 10, "price": 60 },
     { "to": 24, "price": 80 },
