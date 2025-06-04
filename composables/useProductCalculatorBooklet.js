@@ -2,6 +2,12 @@ export function useProductCalculatorBooklet(settings) {
   const getTierPrice = (tiers, value) =>
     tiers.find((t) => value <= t.to)?.price ?? tiers.at(-1)?.price ?? 0;
 
+  const bindingMap = {
+    скоба: "staple",
+    пружина: "spiral",
+    кбс: "glue",
+  };
+
   return function calculatePrice(config) {
     const {
       width,
@@ -78,14 +84,17 @@ export function useProductCalculatorBooklet(settings) {
       coverPrintTotal + coverMaterialTotal + coverLaminationTotal;
 
     // === 📎 Скрепление ===
-    const bindingTable = settings.binding_prices?.[bindingType] ?? [];
+    const bindingKey =
+      bindingMap[bindingType.trim().toLowerCase()] ?? bindingType;
+    const bindingTable = settings.binding_price?.[bindingKey] ?? [];
     const bindingUnitPrice = getTierPrice(bindingTable, totalTirazh);
     const bindingPrice = bindingUnitPrice * totalTirazh;
 
     // === ✂ Общие доп. затраты
+    const cuttingPercentage =
+      settings.cutting_percentage_booklet ?? settings.cutting_percentage;
     const subtotal = blockSubtotal + coverSubtotal + bindingPrice;
-    const cutting = subtotal * (settings.cutting_percentage_booklet / 100);
-
+    const cutting = subtotal * (cuttingPercentage / 100);
     const extras = coverLaminationSetup;
 
     const total = subtotal + cutting + extras;
