@@ -31,7 +31,7 @@ export function useProductCalculatorBooklet(settings) {
 
     const sheet = settings.sheet;
 
-    // ✅ Правильный разворот: ширина = двойная ширина страницы + поля
+    // ✅ Разворот: двойная ширина страницы
     const spreadWidth = width * 2 + sheet.margin * 2;
     const spreadHeight = height + sheet.margin * 2;
 
@@ -42,7 +42,9 @@ export function useProductCalculatorBooklet(settings) {
       Math.floor(sheet.width / spreadHeight) *
       Math.floor(sheet.height / spreadWidth);
 
-    const spreadsPerSheet = Math.max(fitNormal, fitRotated);
+    const spreadsPerOneSide = Math.max(fitNormal, fitRotated);
+    const spreadsPerSheet = spreadsPerOneSide * 2; // двухсторонняя печать
+
     if (!spreadsPerSheet || spreadsPerSheet === 0) return { total: 0 };
 
     // === 📘 Блок ===
@@ -61,7 +63,7 @@ export function useProductCalculatorBooklet(settings) {
     const blockSubtotal = blockPrintTotal + blockMaterialTotal;
 
     // === 📕 Обложка ===
-    const coverSpreadsTotal = adjustedTirazh;
+    const coverSpreadsTotal = adjustedTirazh; // по 1 развороту на обложку
     const coverSheetsNeeded = Math.ceil(coverSpreadsTotal / spreadsPerSheet);
 
     const coverMaterial = settings.materials[materialKey] ?? 0;
@@ -102,7 +104,9 @@ export function useProductCalculatorBooklet(settings) {
 
     return {
       spreadsPerSheet,
+      spreadsPerOneSide,
       block: {
+        spreadsPerBooklet: blockSpreadsPerBooklet,
         spreadsTotal: blockTotalSpreads,
         sheetsNeeded: blockSheetsNeeded,
         printTotal: blockPrintTotal,

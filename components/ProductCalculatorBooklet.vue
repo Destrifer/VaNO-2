@@ -281,6 +281,13 @@ const handleOrder = () => {
           </li>
 
           <li class="font-semibold mt-2">Блок:</li>
+          <li class="text-xs text-gray-500 italic">
+            {{ pages }} стр → {{ Math.ceil(pages / 2) }} разв/брошюру ×
+            {{ totalTirazhWithReserve }} брошюр =
+            {{ result.block.spreadsTotal }} разворотов →
+            {{ result.block.sheetsNeeded }} листов по
+            {{ result.spreadsPerSheet }} на лист
+          </li>
           <li>
             Печать (4+4) × {{ result.block.sheetsNeeded }}:
             <strong>{{ result.block.printTotal.toFixed(2) }} ₽</strong>
