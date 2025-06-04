@@ -295,12 +295,8 @@ const handleOrder = () => {
             <strong>{{ settings.lamination_setup_cost }} ₽</strong>
           </li>
           <li>
-            Скрепление ({{ bindingType }} × {{ totalTirazh }}):
+            Скрепление ({{ bindingType }} × {{ totalTirazhWithReserve }}):
             <strong>{{ result.binding.toFixed(2) }} ₽</strong>
-          </li>
-          <li v-if="result.extras > 0">
-            Доп. опции:
-            <strong>{{ result.extras.toFixed(2) }} ₽</strong>
           </li>
           <li>
             Резка:

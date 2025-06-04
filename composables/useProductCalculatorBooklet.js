@@ -13,8 +13,8 @@ export function useProductCalculatorBooklet(settings) {
       width,
       height,
       views,
-      materialKey, // для обложки
-      materialBlockKey, // для блока
+      materialKey, // обложка
+      materialBlockKey, // блок
       laminationKey,
       printMode,
       useLamination,
@@ -31,8 +31,9 @@ export function useProductCalculatorBooklet(settings) {
 
     const sheet = settings.sheet;
 
-    const spreadWidth = height + sheet.margin * 2;
-    const spreadHeight = width + sheet.margin * 2;
+    // ✅ Правильный разворот: ширина = двойная ширина страницы + поля
+    const spreadWidth = width * 2 + sheet.margin * 2;
+    const spreadHeight = height + sheet.margin * 2;
 
     const fitNormal =
       Math.floor(sheet.width / spreadWidth) *
@@ -44,8 +45,8 @@ export function useProductCalculatorBooklet(settings) {
     const spreadsPerSheet = Math.max(fitNormal, fitRotated);
     if (!spreadsPerSheet || spreadsPerSheet === 0) return { total: 0 };
 
-    // === 📘 Блок (внутренний) ===
-    const blockSpreadsPerBooklet = Math.ceil(pages / 2); // 2 стр на разворот
+    // === 📘 Блок ===
+    const blockSpreadsPerBooklet = Math.ceil(pages / 2);
     const blockTotalSpreads = adjustedTirazh * blockSpreadsPerBooklet;
     const blockSheetsNeeded = Math.ceil(blockTotalSpreads / spreadsPerSheet);
 
@@ -60,7 +61,7 @@ export function useProductCalculatorBooklet(settings) {
     const blockSubtotal = blockPrintTotal + blockMaterialTotal;
 
     // === 📕 Обложка ===
-    const coverSpreadsTotal = adjustedTirazh; // один разворот на брошюру
+    const coverSpreadsTotal = adjustedTirazh;
     const coverSheetsNeeded = Math.ceil(coverSpreadsTotal / spreadsPerSheet);
 
     const coverMaterial = settings.materials[materialKey] ?? 0;
@@ -88,9 +89,9 @@ export function useProductCalculatorBooklet(settings) {
       bindingMap[bindingType.trim().toLowerCase()] ?? bindingType;
     const bindingTable = settings.binding_price?.[bindingKey] ?? [];
     const bindingUnitPrice = getTierPrice(bindingTable, totalTirazh);
-    const bindingPrice = bindingUnitPrice * totalTirazh;
+    const bindingPrice = bindingUnitPrice * adjustedTirazh;
 
-    // === ✂ Общие доп. затраты
+    // === ✂ Доп. затраты
     const cuttingPercentage =
       settings.cutting_percentage_booklet ?? settings.cutting_percentage;
     const subtotal = blockSubtotal + coverSubtotal + bindingPrice;
