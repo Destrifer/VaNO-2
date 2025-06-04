@@ -8,7 +8,7 @@ const defaultValues = {
   views: [{ qty: 20 }],
   printMode: "4+4",
   materialKey: "Мелованная матовая 150 гр.",
-  laminationKey: "Глянцевая 30 мкм",
+  laminationKey: "Ultra Bond глянец",
   useLamination: true,
   pages: 28,
   materialBlockKey: "Офсет 80 гр.",

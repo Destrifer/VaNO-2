@@ -35,7 +35,13 @@ const pages = ref(props.defaultValues.pages || 48);
 const materialBlockKey = ref(Object.keys(settings.materials)[0]);
 const bindingType = ref("скоба");
 const correctionMessage = ref("");
-
+const laminationOptions = computed(() =>
+  Object.fromEntries(
+    Object.entries(settings.lamination).filter(([name]) =>
+      name.toLowerCase().includes("ultra bond")
+    )
+  )
+);
 const { addProduct } = useAddToCart();
 const calculate = useProductCalculatorBooklet(settings);
 
@@ -64,11 +70,13 @@ const result = computed(() =>
 );
 
 const materialsWithStatus = computed(() =>
-  Object.entries(settings.materials).map(([name, price]) => ({
-    name,
-    price,
-    disabled: false,
-  }))
+  Object.entries(settings.materials)
+    .filter(([name]) => !name.toLowerCase().includes("картон"))
+    .map(([name, price]) => ({
+      name,
+      price,
+      disabled: false,
+    }))
 );
 
 const bindingOptions = computed(() => [
@@ -184,7 +192,7 @@ const handleOrder = () => {
         v-model:lamination="laminationKey"
         v-model:useLamination="useLamination"
         :materials="materialsWithStatus"
-        :laminations="settings.lamination"
+        :laminations="laminationOptions"
         @update:width="(val) => (width = val)"
         @update:height="(val) => (height = val)"
         :printMode="printMode"
