@@ -233,7 +233,9 @@ const handleOrder = () => {
               v-for="opt in bindingOptions"
               :key="opt.value"
               :value="opt.value"
-              :disabled="pages > opt.maxPages"
+              :disabled="
+                pages > opt.maxPages || (opt.value === 'кбс' && pages < 100)
+              "
             >
               {{ opt.label }} (до {{ opt.maxPages }} стр.)
             </option>
