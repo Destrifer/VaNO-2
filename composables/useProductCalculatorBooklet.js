@@ -12,13 +12,7 @@ export function useProductCalculatorBooklet(settings) {
       laminationKey,
       printMode,
       useLamination,
-      useBending,
-      bendingFolds,
-      useRoundCorners,
-      cornerCount,
-      drillType,
-      holeCount,
-      enabledOptions = {},
+      bindingType,
       pages = 0,
     } = config;
 
@@ -83,47 +77,16 @@ export function useProductCalculatorBooklet(settings) {
     const coverSubtotal =
       coverPrintTotal + coverMaterialTotal + coverLaminationTotal;
 
+    // === 📎 Скрепление ===
+    const bindingTable = settings.binding_prices?.[bindingType] ?? [];
+    const bindingUnitPrice = getTierPrice(bindingTable, totalTirazh);
+    const bindingPrice = bindingUnitPrice * totalTirazh;
+
     // === ✂ Общие доп. затраты
-    const subtotal = blockSubtotal + coverSubtotal;
+    const subtotal = blockSubtotal + coverSubtotal + bindingPrice;
     const cutting = subtotal * (settings.cutting_percentage / 100);
 
-    let extras = coverLaminationSetup;
-
-    if (
-      useBending &&
-      enabledOptions.bending &&
-      settings.options.bending?.enabled
-    ) {
-      const { base, per_fold } = settings.options.bending;
-      extras += base + per_fold * totalTirazh * Math.min(bendingFolds, 2);
-    }
-
-    if (
-      useRoundCorners &&
-      enabledOptions.round_corners &&
-      settings.options.round_corners?.enabled
-    ) {
-      const { base, per_corner } = settings.options.round_corners;
-      extras += base + per_corner * totalTirazh * Math.min(cornerCount, 4);
-    }
-
-    if (
-      drillType === "pikallo" &&
-      enabledOptions.pikallo &&
-      settings.options.pikallo?.enabled
-    ) {
-      const { base, per_item } = settings.options.pikallo;
-      extras += base + per_item * totalTirazh;
-    }
-
-    if (
-      drillType === "drilling" &&
-      enabledOptions.drilling &&
-      settings.options.drilling?.enabled
-    ) {
-      const { base, per_hole } = settings.options.drilling;
-      extras += base + per_hole * totalTirazh * Math.min(holeCount, 4);
-    }
+    const extras = coverLaminationSetup;
 
     const total = subtotal + cutting + extras;
 
@@ -144,6 +107,7 @@ export function useProductCalculatorBooklet(settings) {
         laminationTotal: coverLaminationTotal,
         subtotal: coverSubtotal,
       },
+      binding: bindingPrice,
       cutting,
       extras,
       total,

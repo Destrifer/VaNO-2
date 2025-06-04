@@ -1,9 +1,7 @@
 <script setup>
 import ProductCalculatorBooklet from "@/components/ProductCalculatorBooklet.vue";
-import BookletPreview from "@/components/products/LeafletsPreview.vue"; // можно заменить на свою визуализацию
-import settings from "@/assets/settings_print.json";
+import BookletPreview from "@/components/products/LeafletsPreview.vue";
 
-// Значения по умолчанию
 const defaultValues = {
   width: 210,
   height: 297,
@@ -12,19 +10,19 @@ const defaultValues = {
   materialKey: "Мелованная матовая 150 гр.",
   laminationKey: "Глянцевая 30 мкм",
   useLamination: true,
-  pages: 28, // ← Добавлено
+  pages: 28,
+  materialBlockKey: "Офсет 80 гр.",
+  bindingType: "staple",
 };
 
-// Включённые опции
 const enabledOptions = {
-  bending: true,
-  round_corners: true,
-  pikallo: true,
-  drilling: true,
+  bending: false,
+  round_corners: false,
+  pikallo: false,
+  drilling: false,
   lamination: true,
 };
 
-// Предустановленные размеры
 const availableSizes = ["A4 (210×297 мм)", "A5 (148×210 мм)"];
 </script>
 

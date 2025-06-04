@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
+import { watch, ref, computed } from "vue";
 import { useProductCalculatorBooklet } from "~/composables/useProductCalculatorBooklet";
 import { useAddToCart } from "~/composables/useAddToCart";
 import settings from "~/assets/settings_print.json";
@@ -33,12 +33,7 @@ const laminationKey = ref(props.defaultValues.laminationKey);
 const useLamination = ref(props.defaultValues.useLamination);
 const pages = ref(props.defaultValues.pages || 48);
 const materialBlockKey = ref(Object.keys(settings.materials)[0]);
-const useBending = ref(false);
-const bendingFolds = ref(1);
-const useRoundCorners = ref(false);
-const cornerCount = ref(4);
-const drillType = ref(null);
-const holeCount = ref(1);
+const bindingType = ref("скоба");
 const correctionMessage = ref("");
 
 const { addProduct } = useAddToCart();
@@ -63,14 +58,8 @@ const result = computed(() =>
     laminationKey: laminationKey.value,
     printMode: printMode.value,
     useLamination: useLamination.value,
-    useBending: useBending.value,
-    bendingFolds: bendingFolds.value,
-    useRoundCorners: useRoundCorners.value,
-    cornerCount: cornerCount.value,
-    drillType: drillType.value,
-    holeCount: holeCount.value,
-    enabledOptions: props.enabledOptions,
     pages: pages.value,
+    bindingType: bindingType.value,
   })
 );
 
@@ -82,7 +71,65 @@ const materialsWithStatus = computed(() =>
   }))
 );
 
-const betterDeals = computed(() => []);
+const bindingOptions = computed(() => [
+  {
+    value: "скоба",
+    label: "Скоба",
+    maxPages: 64,
+  },
+  {
+    value: "пружина",
+    label: "Пружина",
+    maxPages: 200,
+  },
+  {
+    value: "кбс",
+    label: "КБС",
+    maxPages: 300,
+  },
+]);
+
+const betterDeals = computed(() => {
+  const tiers = [50, 100, 200, 300, 500, 1000];
+  const currentPricePerUnit = result.value.total / totalTirazh.value;
+
+  return tiers
+    .filter((tier) => tier > totalTirazh.value)
+    .map((tier) => {
+      const multiplier = tier / totalTirazh.value;
+      const newViews = views.value.map((v) => ({
+        ...v,
+        qty: Math.ceil(v.qty * multiplier),
+      }));
+
+      const newResult = calculate({
+        width: width.value,
+        height: height.value,
+        views: newViews,
+        materialKey: materialKey.value,
+        materialBlockKey: materialBlockKey.value,
+        laminationKey: laminationKey.value,
+        printMode: printMode.value,
+        useLamination: useLamination.value,
+        pages: pages.value,
+        bindingType: bindingType.value,
+      });
+
+      const newPricePerUnit = newResult.total / tier;
+      const savingPercent = Math.round(
+        ((currentPricePerUnit - newPricePerUnit) / currentPricePerUnit) * 100
+      );
+
+      return {
+        neededTirazh: tier,
+        fullUnitPrice: newPricePerUnit.toFixed(2),
+        saving: savingPercent,
+        total: newResult.total,
+      };
+    })
+    .filter((deal) => deal.saving > 0)
+    .sort((a, b) => a.neededTirazh - b.neededTirazh);
+});
 
 const applyDeal = (deal) => {
   const multiplier = deal.neededTirazh / totalTirazh.value;
@@ -90,6 +137,19 @@ const applyDeal = (deal) => {
     view.qty = Math.ceil(view.qty * multiplier);
   });
 };
+
+watch(pages, (newPages) => {
+  const validBinding = bindingOptions.value.find((opt) => {
+    // Если КБС — разрешаем только от 100
+    if (opt.value === "кбс") return newPages >= 100 && newPages <= opt.maxPages;
+    // Для остальных — обычная проверка
+    return newPages <= opt.maxPages;
+  });
+
+  if (validBinding && bindingType.value !== validBinding.value) {
+    bindingType.value = validBinding.value;
+  }
+});
 
 const handleOrder = () => {
   addProduct({
@@ -103,16 +163,7 @@ const handleOrder = () => {
       Материал: materialKey.value,
       "Материал блока": materialBlockKey.value,
       Ламинация: useLamination.value ? laminationKey.value : "без ламинации",
-      Биговка: useBending.value ? `${bendingFolds.value} фальца` : "Нет",
-      "Скругление углов": useRoundCorners.value
-        ? `${cornerCount.value} угла`
-        : "Нет",
-      "Пиккало/Сверление":
-        drillType.value === "pikallo"
-          ? "Пиккало"
-          : drillType.value === "drilling"
-          ? `${holeCount.value} отверстий`
-          : "Нет",
+      Скрепление: bindingType.value,
     },
     price: result.value.total,
   });
@@ -167,64 +218,19 @@ const handleOrder = () => {
       </div>
 
       <div class="space-y-2">
-        <template v-if="enabledOptions.bending">
-          <label class="flex items-center gap-2">
-            <input type="checkbox" v-model="useBending" />
-            Биговка
-          </label>
-          <div v-if="useBending" class="ml-4">
-            Кол-во фальцев:
-            <input
-              type="number"
-              min="1"
-              max="2"
-              v-model.number="bendingFolds"
-              class="border px-2 py-1 w-20"
-            />
-          </div>
-        </template>
-
-        <template v-if="enabledOptions.round_corners">
-          <label class="flex items-center gap-2">
-            <input type="checkbox" v-model="useRoundCorners" />
-            Скругление уголков
-          </label>
-          <div v-if="useRoundCorners" class="ml-4">
-            Кол-во углов:
-            <input
-              type="number"
-              min="1"
-              max="4"
-              v-model.number="cornerCount"
-              class="border px-2 py-1 w-20"
-            />
-          </div>
-        </template>
-
-        <template v-if="enabledOptions.pikallo || enabledOptions.drilling">
-          <label class="block">
-            Пиккало / Сверление:
-            <select v-model="drillType" class="mt-1 border px-2 py-1 w-full">
-              <option :value="null">Не выбрано</option>
-              <option v-if="enabledOptions.pikallo" value="pikallo">
-                Установка пиккало
-              </option>
-              <option v-if="enabledOptions.drilling" value="drilling">
-                Сверление
-              </option>
-            </select>
-          </label>
-          <div v-if="drillType === 'drilling'" class="ml-4">
-            Кол-во отверстий:
-            <input
-              type="number"
-              min="1"
-              max="4"
-              v-model.number="holeCount"
-              class="border px-2 py-1 w-20"
-            />
-          </div>
-        </template>
+        <label class="block">
+          Скрепление:
+          <select v-model="bindingType" class="mt-1 border px-2 py-1 w-full">
+            <option
+              v-for="opt in bindingOptions"
+              :key="opt.value"
+              :value="opt.value"
+              :disabled="pages > opt.maxPages"
+            >
+              {{ opt.label }} (до {{ opt.maxPages }} стр.)
+            </option>
+          </select>
+        </label>
       </div>
 
       <div v-if="correctionMessage" class="text-orange-600 italic text-sm">
@@ -278,7 +284,10 @@ const handleOrder = () => {
             Приладка ламинации:
             <strong>{{ settings.lamination_setup_cost }} ₽</strong>
           </li>
-
+          <li>
+            Скрепление ({{ bindingType }} × {{ totalTirazh }}):
+            <strong>{{ result.binding.toFixed(2) }} ₽</strong>
+          </li>
           <li v-if="result.extras > 0">
             Доп. опции:
             <strong>{{ result.extras.toFixed(2) }} ₽</strong>

@@ -106,6 +106,33 @@
     { "to": 250, "price": 300 },
     { "to": 999999, "price": 400 }
   ],
+  "binding_price": {
+    "staple": [
+      { "to": 50, "price": 35 },
+      { "to": 100, "price": 30 },
+      { "to": 200, "price": 25 },
+      { "to": 300, "price": 20 },
+      { "to": 500, "price": 18 },
+      { "to": 999999, "price": 16 }
+    ],
+    "spiral": [
+      { "to": 50, "price": 80 },
+      { "to": 100, "price": 70 },
+      { "to": 200, "price": 60 },
+      { "to": 300, "price": 55 },
+      { "to": 500, "price": 50 },
+      { "to": 999999, "price": 45 }
+    ],
+    "glue": [
+      { "to": 50, "price": 100 },
+      { "to": 100, "price": 80 },
+      { "to": 200, "price": 70 },
+      { "to": 300, "price": 60 },
+      { "to": 500, "price": 50 },
+      { "to": 999999, "price": 40 }
+    ]
+  },
+
   "options": {
     "bending": {
       "enabled": true,
