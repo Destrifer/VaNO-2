@@ -13,8 +13,8 @@ export function useProductCalculatorBooklet(settings) {
       width,
       height,
       views,
-      materialKey, // обложка
-      materialBlockKey, // блок
+      materialKey,
+      materialBlockKey,
       laminationKey,
       printMode,
       useLamination,
@@ -31,7 +31,7 @@ export function useProductCalculatorBooklet(settings) {
 
     const sheet = settings.sheet;
 
-    // ✅ Разворот: двойная ширина страницы
+    // Размер разворота (A3) с учетом полей
     const spreadWidth = width * 2 + sheet.margin * 2;
     const spreadHeight = height + sheet.margin * 2;
 
@@ -42,8 +42,8 @@ export function useProductCalculatorBooklet(settings) {
       Math.floor(sheet.width / spreadHeight) *
       Math.floor(sheet.height / spreadWidth);
 
-    const spreadsPerOneSide = Math.max(fitNormal, fitRotated);
-    const spreadsPerSheet = spreadsPerOneSide * 2; // двухсторонняя печать
+    const spreadsPerSide = Math.max(fitNormal, fitRotated);
+    const spreadsPerSheet = spreadsPerSide * 2;
 
     if (!spreadsPerSheet || spreadsPerSheet === 0) return { total: 0 };
 
@@ -57,14 +57,13 @@ export function useProductCalculatorBooklet(settings) {
       settings.print_price["4+4"],
       blockSheetsNeeded
     );
-
     const blockPrintTotal = blockPrintPerSheet * blockSheetsNeeded;
     const blockMaterialTotal = blockMaterial * blockSheetsNeeded;
     const blockSubtotal = blockPrintTotal + blockMaterialTotal;
 
     // === 📕 Обложка ===
-    const coverSpreadsTotal = adjustedTirazh; // по 1 развороту на обложку
-    const coverSheetsNeeded = Math.ceil(coverSpreadsTotal / spreadsPerSheet);
+    const coverSpreadsTotal = adjustedTirazh;
+    const coverSheetsNeeded = coverSpreadsTotal; // 1 обложка = 1 лист (печатается с одной стороны)
 
     const coverMaterial = settings.materials[materialKey] ?? 0;
     const coverLamination = useLamination
@@ -78,7 +77,6 @@ export function useProductCalculatorBooklet(settings) {
       settings.print_price[printMode],
       coverSheetsNeeded
     );
-
     const coverPrintTotal = coverPrintPerSheet * coverSheetsNeeded;
     const coverMaterialTotal = coverMaterial * coverSheetsNeeded;
     const coverLaminationTotal = coverLamination * coverSheetsNeeded;
@@ -104,7 +102,7 @@ export function useProductCalculatorBooklet(settings) {
 
     return {
       spreadsPerSheet,
-      spreadsPerOneSide,
+      spreadsPerSide,
       block: {
         spreadsPerBooklet: blockSpreadsPerBooklet,
         spreadsTotal: blockTotalSpreads,
