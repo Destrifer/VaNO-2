@@ -40,15 +40,7 @@
         '/images/main/23.jpg',
       ]"
     />
-    <div class="columns-1 sm:columns-2 md:columns-3 gap-8">
-      <ParallaxImage
-        v-for="(img, i) in images"
-        :key="i"
-        :src="img.src"
-        :aspect="img.aspect"
-        :caption="`Фото #${i + 1}`"
-      />
-    </div>
+    <ParallaxImage src="/images/main/5.jpg" caption="Парящий заголовок" />
     <NuxtLink
       to="/"
       class="inline-block bg-primary text-text font-semibold px-6 py-3 rounded-2xl hover:bg-yellow-400 transition mt-6"

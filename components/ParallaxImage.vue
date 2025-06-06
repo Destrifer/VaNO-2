@@ -1,78 +1,39 @@
 <template>
   <div
     ref="tiltRef"
-    class="mb-4 rounded-xl border border-gray-200 shadow-md bg-white overflow-hidden break-inside-avoid"
+    class="w-[400px] h-[300px] mx-auto mt-20 text-black flex items-center justify-center bg-cover bg-center"
     data-tilt
-    data-tilt-glare="true"
-    data-tilt-max-glare="0.4"
+    data-tilt-max="25"
     data-tilt-scale="1.05"
     data-tilt-speed="500"
+    data-tilt-perspective="1000"
+    :style="tiltStyle"
   >
-    <div
-      :class="aspectClass"
-      class="w-full relative transform-style preserve-3d"
-      style="transform: perspective(1000px)"
-    >
-      <img
-        :src="src"
-        alt=""
-        class="absolute inset-0 w-full h-full object-cover"
-      />
-
-      <div
-        v-if="caption"
-        class="absolute left-1/2 bottom-[20%] translate-x-[-50%] z-10"
-        style="transform: translateZ(20px)"
-      >
-        <div
-          class="text-black text-lg font-bold bg-white/80 px-4 py-2 rounded shadow backdrop-blur-sm"
-        >
-          {{ caption }}
-        </div>
-      </div>
-    </div>
+    <h1 style="transform: translateZ(50px); font-size: 2rem">
+      {{ caption }}
+    </h1>
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref, computed } from "vue";
+import { ref, onMounted, computed } from "vue";
 import VanillaTilt from "vanilla-tilt";
 
 const props = defineProps({
   src: { type: String, required: true },
-  caption: { type: String, default: "" },
-  aspect: { type: String, default: "square" }, // square | wide | tall
+  caption: { type: String, default: "vanilla-tilt.js" },
 });
 
 const tiltRef = ref(null);
 
-const aspectClass = computed(() => {
-  switch (props.aspect) {
-    case "wide":
-      return "aspect-[2/1]";
-    case "tall":
-      return "aspect-[3/4]";
-    default:
-      return "aspect-square";
-  }
-});
-
 onMounted(() => {
   if (tiltRef.value) {
-    VanillaTilt.init(tiltRef.value, {
-      max: 5,
-      speed: 500,
-      scale: 1.05,
-      glare: true,
-      "max-glare": 0.4,
-      gyroscope: true,
-    });
+    VanillaTilt.init(tiltRef.value);
   }
 });
-</script>
 
-<style scoped>
-.transform-style {
-  transform-style: preserve-3d;
-}
-</style>
+const tiltStyle = computed(() => ({
+  backgroundImage: `url(${props.src})`,
+  transformStyle: "preserve-3d",
+}));
+</script>
