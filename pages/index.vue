@@ -40,13 +40,17 @@
         '/images/main/23.jpg',
       ]"
     />
-    <div class="columns-1 sm:columns-2 md:columns-3 gap-4 space-y-4">
+    <div class="columns-1 sm:columns-2 md:columns-3 gap-8 space-y-8">
       <div
         v-for="(img, index) in images"
         :key="index"
         class="break-inside-avoid"
       >
-        <ParallaxImage :src="img.src" :caption="img.caption" />
+        <ParallaxImage
+          :src="img.src"
+          :caption="img.caption"
+          :aspect="img.aspect"
+        />
       </div>
     </div>
     <NuxtLink
@@ -62,28 +66,28 @@
 import ImageCarousel from "@/components/ImageCarousel.vue";
 import ProductCardsGrid from "~/components/ProductCardsGrid.vue";
 const images = [
-  { src: "/images/main/1.jpg", caption: "Команда в сборе" },
-  { src: "/images/main/2.jpg", caption: "Прототип 2.0" },
-  { src: "/images/main/3.jpg", caption: "Закат над морем" },
-  { src: "/images/main/4.jpg", caption: "Новое направление" },
-  { src: "/images/main/5.jpg", caption: "Тестирование" },
-  { src: "/images/main/6.jpg", caption: "Офис в горах" },
-  { src: "/images/main/7.jpg", caption: "Раннее утро" },
-  { src: "/images/main/8.jpg", caption: "Производство" },
-  { src: "/images/main/9.jpg", caption: "Промо-кампания" },
-  { src: "/images/main/10.jpg", caption: "Тренинг" },
-  { src: "/images/main/11.jpg", caption: "Обед на крыше" },
-  { src: "/images/main/12.jpg", caption: "Совещание" },
-  { src: "/images/main/13.jpg", caption: "Демо-день" },
-  { src: "/images/main/14.jpg", caption: "Финал хакатона" },
-  { src: "/images/main/15.jpg", caption: "Интервью" },
-  { src: "/images/main/16.jpg", caption: "Новая локация" },
-  { src: "/images/main/17.jpg", caption: "Встреча партнёров" },
-  { src: "/images/main/18.jpg", caption: "Конференция" },
-  { src: "/images/main/19.jpg", caption: "Дорожная карта" },
-  { src: "/images/main/20.jpg", caption: "Результаты" },
-  { src: "/images/main/21.jpg", caption: "Обратная связь" },
-  { src: "/images/main/22.jpg", caption: "Миссия выполнена" },
-  { src: "/images/main/23.jpg", caption: "До новых встреч" },
+  { src: "/images/main/1.jpg", caption: "Команда в сборе", aspect: "wide" },
+  { src: "/images/main/2.jpg", caption: "Прототип 2.0", aspect: "square" },
+  { src: "/images/main/3.jpg", caption: "Закат над морем", aspect: "tall" },
+  { src: "/images/main/4.jpg", caption: "Новое направление", aspect: "square" },
+  { src: "/images/main/5.jpg", caption: "Тестирование", aspect: "wide" },
+  { src: "/images/main/6.jpg", caption: "Офис в горах", aspect: "tall" },
+  { src: "/images/main/7.jpg", caption: "Раннее утро", aspect: "square" },
+  { src: "/images/main/8.jpg", caption: "Производство", aspect: "wide" },
+  { src: "/images/main/9.jpg", caption: "Промо-кампания", aspect: "square" },
+  { src: "/images/main/10.jpg", caption: "Тренинг", aspect: "tall" },
+  { src: "/images/main/11.jpg", caption: "Обед на крыше", aspect: "square" },
+  { src: "/images/main/12.jpg", caption: "Совещание", aspect: "wide" },
+  { src: "/images/main/13.jpg", caption: "Демо-день", aspect: "tall" },
+  { src: "/images/main/14.jpg", caption: "Финал хакатона", aspect: "square" },
+  { src: "/images/main/15.jpg", caption: "Интервью", aspect: "wide" },
+  { src: "/images/main/16.jpg", caption: "Новая локация", aspect: "square" },
+  { src: "/images/main/17.jpg", caption: "Встреча партнёров", aspect: "tall" },
+  { src: "/images/main/18.jpg", caption: "Конференция", aspect: "wide" },
+  { src: "/images/main/19.jpg", caption: "Дорожная карта", aspect: "square" },
+  { src: "/images/main/20.jpg", caption: "Результаты", aspect: "tall" },
+  { src: "/images/main/21.jpg", caption: "Обратная связь", aspect: "square" },
+  { src: "/images/main/22.jpg", caption: "Миссия выполнена", aspect: "wide" },
+  { src: "/images/main/23.jpg", caption: "До новых встреч", aspect: "square" },
 ];
 </script>

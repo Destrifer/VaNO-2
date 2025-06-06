@@ -1,7 +1,8 @@
 <template>
   <div
     ref="tiltRef"
-    class="w-full h-[300px] bg-cover bg-center relative mx-auto my-4"
+    class="w-full relative mx-auto my-4"
+    :class="aspectClass"
     data-tilt
     data-tilt-max="20"
     data-tilt-scale="1.05"
@@ -11,7 +12,7 @@
   >
     <!-- Парящий текст -->
     <h2
-      class="absolute left-1/2 bottom-[30%] -translate-x-1/2 text-black text-lg font-bold"
+      class="absolute left-1/2 bottom-[30%] -translate-x-1/2 text-black text-lg font-bold text-center"
       style="transform: translateZ(50px)"
     >
       {{ caption }}
@@ -26,6 +27,7 @@ import VanillaTilt from "vanilla-tilt";
 const props = defineProps({
   src: { type: String, required: true },
   caption: { type: String, default: "" },
+  aspect: { type: String, default: "square" }, // 'square' | 'wide' | 'tall'
 });
 
 const tiltRef = ref(null);
@@ -38,6 +40,19 @@ onMounted(() => {
 
 const tiltStyle = computed(() => ({
   backgroundImage: `url(${props.src})`,
+  backgroundSize: "cover",
+  backgroundPosition: "center",
   transformStyle: "preserve-3d",
 }));
+
+const aspectClass = computed(() => {
+  switch (props.aspect) {
+    case "wide":
+      return "aspect-[2/1]";
+    case "tall":
+      return "aspect-[3/4]";
+    default:
+      return "aspect-square";
+  }
+});
 </script>
