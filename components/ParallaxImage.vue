@@ -1,7 +1,7 @@
 <template>
   <div
     ref="tiltRef"
-    class="w-full relative mx-auto my-4 rounded-xl shadow-md border border-gray-200"
+    class="w-full relative mx-auto my-4 rounded-xl shadow-md border border-gray-200 cursor-pointer"
     :class="aspectClass"
     data-tilt
     data-tilt-max="5"
@@ -9,8 +9,9 @@
     data-tilt-speed="500"
     data-tilt-perspective="1000"
     :style="tiltStyle"
+    @click="openFancybox"
   >
-    <!-- Парящий текст (пока без стилей, только положение) -->
+    <!-- Парящий текст -->
     <h2
       class="absolute left-1/2 bottom-[10%] -translate-x-1/2 text-3xl font-extrabold text-black text-center pointer-events-none"
       style="
@@ -28,6 +29,8 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import VanillaTilt from "vanilla-tilt";
+import { Fancybox } from "@fancyapps/ui";
+import "@fancyapps/ui/dist/fancybox/fancybox.css";
 
 const props = defineProps({
   src: { type: String, required: true },
@@ -42,6 +45,16 @@ onMounted(() => {
     VanillaTilt.init(tiltRef.value);
   }
 });
+
+function openFancybox() {
+  Fancybox.show([
+    {
+      src: props.src,
+      type: "image",
+      caption: props.caption,
+    },
+  ]);
+}
 
 const tiltStyle = computed(() => ({
   backgroundImage: `url(${props.src})`,
