@@ -13,7 +13,7 @@
         '/certificates',
       ]"
     />
-    <ImageCarousel
+    <!--<ImageCarousel
       :images="[
         '/images/main/1.jpg',
         '/images/main/2.jpg',
@@ -39,7 +39,7 @@
         '/images/main/22.jpg',
         '/images/main/23.jpg',
       ]"
-    />
+    />-->
     <div class="columns-1 sm:columns-2 md:columns-3 gap-8 space-y-8">
       <div
         v-for="(img, index) in images"
