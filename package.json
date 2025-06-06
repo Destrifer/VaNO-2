@@ -31,6 +31,7 @@
     "pinia-plugin-persistedstate": "^4.2.0",
     "tailwindcss": "^4.1.4",
     "typescript": "^5.8.3",
+    "vanilla-tilt": "^1.8.1",
     "vue": "^3.5.13",
     "vue-imask": "^7.6.1",
     "vue-router": "^4.5.0",

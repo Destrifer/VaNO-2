@@ -40,7 +40,15 @@
         '/images/main/23.jpg',
       ]"
     />
-
+    <div class="columns-1 sm:columns-2 md:columns-3 gap-8">
+      <ParallaxImage
+        v-for="(img, i) in images"
+        :key="i"
+        :src="img.src"
+        :aspect="img.aspect"
+        :caption="`Фото #${i + 1}`"
+      />
+    </div>
     <NuxtLink
       to="/"
       class="inline-block bg-primary text-text font-semibold px-6 py-3 rounded-2xl hover:bg-yellow-400 transition mt-6"
@@ -53,4 +61,16 @@
 <script setup>
 import ImageCarousel from "@/components/ImageCarousel.vue";
 import ProductCardsGrid from "~/components/ProductCardsGrid.vue";
+const images = [
+  { src: "/images/main/1.jpg", aspect: "square" },
+  { src: "/images/main/2.jpg", aspect: "wide" },
+  { src: "/images/main/3.jpg", aspect: "tall" },
+  { src: "/images/main/4.jpg", aspect: "square" },
+  { src: "/images/main/5.jpg", aspect: "wide" },
+  { src: "/images/main/6.jpg", aspect: "tall" },
+  { src: "/images/main/7.jpg", aspect: "square" },
+  { src: "/images/main/8.jpg", aspect: "square" },
+  { src: "/images/main/9.jpg", aspect: "wide" },
+  { src: "/images/main/10.jpg", aspect: "tall" },
+];
 </script>
