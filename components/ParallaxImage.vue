@@ -1,17 +1,21 @@
 <template>
   <div
     ref="tiltRef"
-    class="w-[400px] h-[300px] mx-auto mt-20 text-black flex items-center justify-center bg-cover bg-center"
+    class="w-full h-[300px] bg-cover bg-center relative mx-auto my-4"
     data-tilt
-    data-tilt-max="25"
+    data-tilt-max="20"
     data-tilt-scale="1.05"
     data-tilt-speed="500"
     data-tilt-perspective="1000"
     :style="tiltStyle"
   >
-    <h1 style="transform: translateZ(50px); font-size: 2rem">
+    <!-- Парящий текст -->
+    <h2
+      class="absolute left-1/2 bottom-[30%] -translate-x-1/2 text-black text-lg font-bold"
+      style="transform: translateZ(50px)"
+    >
       {{ caption }}
-    </h1>
+    </h2>
   </div>
 </template>
 
@@ -21,7 +25,7 @@ import VanillaTilt from "vanilla-tilt";
 
 const props = defineProps({
   src: { type: String, required: true },
-  caption: { type: String, default: "vanilla-tilt.js" },
+  caption: { type: String, default: "" },
 });
 
 const tiltRef = ref(null);
