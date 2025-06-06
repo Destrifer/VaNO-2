@@ -2,7 +2,7 @@
   <a
     :href="src"
     data-fancybox="gallery"
-    class="w-full relative mx-auto my-4 block rounded-xl shadow-md border border-gray-200"
+    class="w-full relative mx-auto my-4 block rounded-xl shadow-md border border-gray-200 cursor-pointer overflow-hidden"
     :class="aspectClass"
   >
     <!-- Tilt wrapper -->
@@ -17,7 +17,7 @@
       data-tilt-perspective="1000"
       style="transform-style: preserve-3d"
     >
-      <!-- Изображение через NuxtImg -->
+      <!-- Оптимизированное изображение -->
       <div class="absolute inset-0 z-0 pointer-events-none">
         <NuxtImg
           :src="src"
@@ -31,7 +31,7 @@
         />
       </div>
 
-      <!-- Подпись с эффектом парения -->
+      <!-- Парящий текст -->
       <h2
         class="absolute left-1/2 bottom-[10%] -translate-x-1/2 text-3xl font-extrabold text-black text-center pointer-events-none"
         style="
