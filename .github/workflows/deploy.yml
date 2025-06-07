@@ -30,7 +30,7 @@ jobs:
           username: ${{ secrets.NUXT_DEPLOY_USER }}
           key: ${{ secrets.NUXT_DEPLOY_KEY }}
           source: ".output/public/*"
-          target: "/home/nuxt/site/output"
+          target: "/home/nuxt/site/.output/public"
 
       - name: Restart container
         uses: appleboy/ssh-action@v1.0.3
