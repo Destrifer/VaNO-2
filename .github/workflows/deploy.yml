@@ -45,9 +45,10 @@ jobs:
           host: ${{ secrets.NUXT_DEPLOY_HOST }}
           username: ${{ secrets.NUXT_DEPLOY_USER }}
           key: ${{ secrets.NUXT_DEPLOY_KEY }}
-          source: "./.output/public/."
+          source: ".output/public/**"
           target: "/home/nuxt/site/.output/public"
           overwrite: true
+          strip_components: 2
 
       - name: Перезапуск контейнера
         uses: appleboy/ssh-action@v1.0.3
