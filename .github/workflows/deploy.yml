@@ -45,7 +45,7 @@ jobs:
           host: ${{ secrets.NUXT_DEPLOY_HOST }}
           username: ${{ secrets.NUXT_DEPLOY_USER }}
           key: ${{ secrets.NUXT_DEPLOY_KEY }}
-          source: ".output/public/"
+          source: ".output/public/*"
           target: "/home/nuxt/site/.output/public"
           overwrite: true
 
