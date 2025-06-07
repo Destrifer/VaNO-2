@@ -23,17 +23,33 @@ jobs:
       - name: Generate static site
         run: npx nuxi generate
 
-      - name: Copy files to server
+      - name: Проверка содержимого сборки
+        run: |
+          echo "=== Содержимое .output/public ==="
+          ls -la .output/public
+          echo "=== Начало index.html ==="
+          head -n 10 .output/public/index.html || echo "Файл index.html не найден"
+
+      - name: Очистить старую сборку на сервере
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.NUXT_DEPLOY_HOST }}
+          username: ${{ secrets.NUXT_DEPLOY_USER }}
+          key: ${{ secrets.NUXT_DEPLOY_KEY }}
+          script: |
+            rm -rf /home/nuxt/site/.output/public/*
+
+      - name: Копирование файлов на сервер
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.NUXT_DEPLOY_HOST }}
           username: ${{ secrets.NUXT_DEPLOY_USER }}
           key: ${{ secrets.NUXT_DEPLOY_KEY }}
-          source: ".output/public/*"
+          source: ".output/public/"
           target: "/home/nuxt/site/.output/public"
           overwrite: true
 
-      - name: Restart container
+      - name: Перезапуск контейнера
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.NUXT_DEPLOY_HOST }}
