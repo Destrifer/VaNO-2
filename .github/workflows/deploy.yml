@@ -31,6 +31,7 @@ jobs:
           key: ${{ secrets.NUXT_DEPLOY_KEY }}
           source: ".output/public/*"
           target: "/home/nuxt/site/.output/public"
+          overwrite: true
 
       - name: Restart container
         uses: appleboy/ssh-action@v1.0.3
