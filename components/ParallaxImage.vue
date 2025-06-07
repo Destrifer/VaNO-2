@@ -31,18 +31,26 @@
         />
       </div>
 
-      <!-- Парящий текст -->
-      <h2
-        class="absolute left-1/2 bottom-[10%] -translate-x-1/2 text-3xl font-extrabold text-black text-center pointer-events-none"
-        style="
-          transform: translateZ(50px);
-          -webkit-text-stroke: 1px white;
-          text-shadow: 1px 1px 0 #fff, 2px 2px 0 #bbb,
-            3px 3px 1px rgba(0, 0, 0, 0.2);
-        "
+      <!-- Подложка и надпись -->
+      <div
+        class="absolute left-1/2 bottom-[10%] -translate-x-1/2 pointer-events-none group"
+        style="transform: translateZ(50px)"
       >
-        {{ caption }}
-      </h2>
+        <div
+          class="px-3 py-1.5 rounded-md border border-black bg-[#ffd600cc] shadow-md backdrop-blur-sm transition-all duration-300 group-hover:shadow-lg"
+        >
+          <div
+            class="text-xl font-bold text-black text-center"
+            style="
+              -webkit-text-stroke: 0.3px white;
+              text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5),
+                2px 2px 2px rgba(0, 0, 0, 0.2);
+            "
+          >
+            {{ caption }}
+          </div>
+        </div>
+      </div>
     </div>
   </a>
 </template>
