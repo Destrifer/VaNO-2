@@ -1,7 +1,7 @@
 <template>
   <section class="text-center py-16 space-y-5">
     <h1 class="text-4xl md:text-6xl font-bold text-text mb-6">
-      Добро пожаловать в CentralPrint
+      Добро пожаловать в CentralPrint!
     </h1>
     <ProductCardsGrid
       :list="[
