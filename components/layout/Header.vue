@@ -24,7 +24,7 @@
       <!-- Контакты -->
       <nav aria-label="Контакты" class="flex gap-4 items-center text-sm-fluid">
         <a
-          href="https://t.me/yourbot"
+          href="https://t.me/CentralPrintBot"
           class="flex items-center hover-scale"
           target="_blank"
           aria-label="Telegram"
