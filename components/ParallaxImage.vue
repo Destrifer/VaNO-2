@@ -2,10 +2,10 @@
   <a
     :href="src"
     data-fancybox="gallery"
+    :data-caption="captionHtml"
     class="w-full relative mx-auto my-4 block rounded-xl shadow-md border border-gray-200 cursor-pointer overflow-hidden"
     :class="aspectClass"
   >
-    <!-- Tilt wrapper -->
     <div
       ref="tiltRef"
       class="w-full h-full"
@@ -17,7 +17,7 @@
       data-tilt-perspective="1000"
       style="transform-style: preserve-3d"
     >
-      <!-- Оптимизированное изображение -->
+      <!-- Изображение -->
       <div class="absolute inset-0 z-0 pointer-events-none">
         <NuxtImg
           :src="src"
@@ -31,7 +31,7 @@
         />
       </div>
 
-      <!-- Подложка и надпись -->
+      <!-- Подпись на превью -->
       <div
         class="absolute left-1/2 bottom-[10%] -translate-x-1/2 pointer-events-none group"
         style="transform: translateZ(50px)"
@@ -66,6 +66,7 @@ const props = defineProps({
   src: { type: String, required: true },
   caption: { type: String, default: "" },
   aspect: { type: String, default: "square" }, // square | wide | tall
+  link: { type: String, default: "" },
 });
 
 const tiltRef = ref(null);
@@ -103,4 +104,51 @@ const aspectClass = computed(() => {
       return "aspect-square";
   }
 });
+
+const captionHtml = computed(() => {
+  if (!props.link) return props.caption;
+  return `
+    <div class="fancybox-caption-custom">
+      <div class="caption-text">${props.caption}</div>
+      <a href="${props.link}" class="caption-button" target="_blank">Рассчитать стоимость</a>
+    </div>
+  `;
+});
 </script>
+
+<style>
+/* Fancybox caption поверх картинки */
+.fancybox-caption-custom {
+  position: absolute;
+  bottom: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  z-index: 1000;
+  width: 100%;
+}
+
+.caption-text {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: white;
+  text-shadow: 1px 1px 4px black;
+  margin-bottom: 1rem;
+}
+
+.caption-button {
+  display: inline-block;
+  background: #ffd600cc;
+  color: #000;
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.caption-button:hover {
+  background: #e6c200;
+}
+</style>

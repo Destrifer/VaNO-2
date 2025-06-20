@@ -50,6 +50,7 @@
           :src="img.src"
           :caption="img.caption"
           :aspect="img.aspect"
+          :link="img.link"
         />
       </div>
     </div>
@@ -66,28 +67,143 @@
 import ImageCarousel from "@/components/ImageCarousel.vue";
 import ProductCardsGrid from "~/components/ProductCardsGrid.vue";
 const images = [
-  { src: "/images/main/1.jpg", caption: "Команда в сборе", aspect: "wide" },
-  { src: "/images/main/2.jpg", caption: "Прототип 2.0", aspect: "square" },
-  { src: "/images/main/3.jpg", caption: "Закат над морем", aspect: "tall" },
-  { src: "/images/main/4.jpg", caption: "Новое направление", aspect: "square" },
-  { src: "/images/main/5.jpg", caption: "Тестирование", aspect: "wide" },
-  { src: "/images/main/6.jpg", caption: "Офис в горах", aspect: "tall" },
-  { src: "/images/main/7.jpg", caption: "Раннее утро", aspect: "square" },
-  { src: "/images/main/8.jpg", caption: "Производство", aspect: "wide" },
-  { src: "/images/main/9.jpg", caption: "Промо-кампания", aspect: "square" },
-  { src: "/images/main/10.jpg", caption: "Тренинг", aspect: "tall" },
-  { src: "/images/main/11.jpg", caption: "Обед на крыше", aspect: "square" },
-  { src: "/images/main/12.jpg", caption: "Совещание", aspect: "wide" },
-  { src: "/images/main/13.jpg", caption: "Демо-день", aspect: "tall" },
-  { src: "/images/main/14.jpg", caption: "Финал хакатона", aspect: "square" },
-  { src: "/images/main/15.jpg", caption: "Интервью", aspect: "wide" },
-  { src: "/images/main/16.jpg", caption: "Новая локация", aspect: "square" },
-  { src: "/images/main/17.jpg", caption: "Встреча партнёров", aspect: "tall" },
-  { src: "/images/main/18.jpg", caption: "Конференция", aspect: "wide" },
-  { src: "/images/main/19.jpg", caption: "Дорожная карта", aspect: "square" },
-  { src: "/images/main/20.jpg", caption: "Результаты", aspect: "tall" },
-  { src: "/images/main/21.jpg", caption: "Обратная связь", aspect: "square" },
-  { src: "/images/main/22.jpg", caption: "Миссия выполнена", aspect: "wide" },
-  { src: "/images/main/23.jpg", caption: "До новых встреч", aspect: "square" },
+  {
+    src: "/images/main/1.jpg",
+    caption: "Команда в сборе",
+    aspect: "wide",
+    link: "/flyers",
+  },
+  {
+    src: "/images/main/2.jpg",
+    caption: "Прототип 2.0",
+    aspect: "square",
+    link: "/flyers",
+  },
+  {
+    src: "/images/main/3.jpg",
+    caption: "Закат над морем",
+    aspect: "tall",
+    link: "/flyers",
+  },
+  {
+    src: "/images/main/4.jpg",
+    caption: "Новое направление",
+    aspect: "square",
+    link: "/flyers",
+  },
+  {
+    src: "/images/main/5.jpg",
+    caption: "Тестирование",
+    aspect: "wide",
+    link: "/flyers",
+  },
+  {
+    src: "/images/main/6.jpg",
+    caption: "Офис в горах",
+    aspect: "tall",
+    link: "/flyers",
+  },
+  {
+    src: "/images/main/7.jpg",
+    caption: "Раннее утро",
+    aspect: "square",
+    link: "/flyers",
+  },
+  {
+    src: "/images/main/8.jpg",
+    caption: "Производство",
+    aspect: "wide",
+    link: "/flyers",
+  },
+  {
+    src: "/images/main/9.jpg",
+    caption: "Промо-кампания",
+    aspect: "square",
+    link: "/flyers",
+  },
+  {
+    src: "/images/main/10.jpg",
+    caption: "Тренинг",
+    aspect: "tall",
+    link: "/flyers",
+  },
+  {
+    src: "/images/main/11.jpg",
+    caption: "Обед на крыше",
+    aspect: "square",
+    link: "/flyers",
+  },
+  {
+    src: "/images/main/12.jpg",
+    caption: "Совещание",
+    aspect: "wide",
+    link: "/flyers",
+  },
+  {
+    src: "/images/main/13.jpg",
+    caption: "Демо-день",
+    aspect: "tall",
+    link: "/flyers",
+  },
+  {
+    src: "/images/main/14.jpg",
+    caption: "Финал хакатона",
+    aspect: "square",
+    link: "/flyers",
+  },
+  {
+    src: "/images/main/15.jpg",
+    caption: "Интервью",
+    aspect: "wide",
+    link: "/flyers",
+  },
+  {
+    src: "/images/main/16.jpg",
+    caption: "Новая локация",
+    aspect: "square",
+    link: "/flyers",
+  },
+  {
+    src: "/images/main/17.jpg",
+    caption: "Встреча партнёров",
+    aspect: "tall",
+    link: "/flyers",
+  },
+  {
+    src: "/images/main/18.jpg",
+    caption: "Конференция",
+    aspect: "wide",
+    link: "/flyers",
+  },
+  {
+    src: "/images/main/19.jpg",
+    caption: "Дорожная карта",
+    aspect: "square",
+    link: "/flyers",
+  },
+  {
+    src: "/images/main/20.jpg",
+    caption: "Результаты",
+    aspect: "tall",
+    link: "/flyers",
+  },
+  {
+    src: "/images/main/21.jpg",
+    caption: "Обратная связь",
+    aspect: "square",
+    link: "/flyers",
+  },
+  {
+    src: "/images/main/22.jpg",
+    caption: "Миссия выполнена",
+    aspect: "wide",
+    link: "/flyers",
+  },
+  {
+    src: "/images/main/23.jpg",
+    caption: "До новых встреч",
+    aspect: "square",
+    link: "/flyers",
+  },
 ];
 </script>
