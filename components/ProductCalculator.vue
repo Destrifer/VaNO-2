@@ -23,8 +23,7 @@
         :printMode="printMode"
         @update:printMode="(val) => (printMode = val)"
         :enabledOptions="enabledOptions"
-        :availableSizes="availableSizes"
-        :sizes="settings.sizes"
+        :sizes="props.sizes"
       />
 
       <FoilPreview
@@ -214,11 +213,11 @@ const props = defineProps({
   icon: String,
   defaultValues: Object,
   enabledOptions: Object,
-  previewComponent: [Object, Function],
-  availableSizes: {
-    type: Array,
-    default: () => [],
+  sizes: {
+    type: Object,
+    default: () => ({}),
   },
+  previewComponent: [Object, Function],
 });
 
 const views = ref(props.defaultValues.views || [{ qty: 500 }]);

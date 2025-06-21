@@ -23,7 +23,10 @@ const enabledOptions = {
   lamination: true,
 };
 
-const availableSizes = ["A4 (210×297 мм)", "A5 (148×210 мм)"];
+const sizes = {
+  "A4 (210×297 мм)": { width: 210, height: 297 },
+  "A5 (148×210 мм)": { width: 148, height: 210 },
+};
 </script>
 
 <template>
@@ -32,7 +35,7 @@ const availableSizes = ["A4 (210×297 мм)", "A5 (148×210 мм)"];
     icon="/icons/booklet.svg"
     :defaultValues="defaultValues"
     :enabledOptions="enabledOptions"
-    :availableSizes="availableSizes"
+    :sizes="sizes"
     :previewComponent="BookletPreview"
     :allowCustomSize="false"
   />

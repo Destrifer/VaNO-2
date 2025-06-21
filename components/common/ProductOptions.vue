@@ -29,10 +29,6 @@ const props = defineProps({
       foil: true,
     }),
   },
-  availableSizes: {
-    type: Array,
-    default: () => [],
-  },
   allowCustomSize: {
     type: Boolean,
     default: true,
@@ -71,6 +67,7 @@ const foilColorProxy = ref(props.foilColor);
 const isComplexShapeProxy = ref(props.isComplexShape);
 const pagesProxy = ref(props.pages);
 const selectedFormat = ref("Custom");
+const availableSizes = computed(() => Object.keys(props.sizes));
 
 watch(
   () => props.material,
@@ -116,7 +113,7 @@ watch(isComplexShapeProxy, (val) => emit("update:isComplexShape", val));
 watch(
   () => [props.width, props.height],
   ([w, h]) => {
-    for (const key of props.availableSizes) {
+    for (const key of availableSizes.value) {
       const size = props.sizes[key];
       if (size && size.width === w && size.height === h) {
         selectedFormat.value = key;

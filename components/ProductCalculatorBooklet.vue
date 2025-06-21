@@ -14,9 +14,9 @@ const props = defineProps({
   defaultValues: Object,
   enabledOptions: Object,
   previewComponent: [Object, Function],
-  availableSizes: {
-    type: Array,
-    default: () => [],
+  sizes: {
+    type: Object,
+    default: () => ({}),
   },
   allowCustomSize: {
     type: Boolean,
@@ -199,8 +199,7 @@ const handleOrder = () => {
         @update:printMode="(val) => (printMode = val)"
         :enabledOptions="enabledOptions"
         :availableSizes="availableSizes"
-        :sizes="settings.sizes"
-        :allowCustomSize="allowCustomSize"
+        :sizes="props.sizes"
         :showPages="true"
         :pages="pages"
         @update:pages="(val) => (pages = val)"

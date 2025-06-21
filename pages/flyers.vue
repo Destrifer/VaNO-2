@@ -27,7 +27,11 @@ const enabledOptions = {
 };
 
 // Предустановленные размеры
-const availableSizes = ["A5 (148×210 мм)", "A4 (210×297 мм)", "90×50 мм"];
+const sizes = {
+  "A5 (148×210 мм)": { width: 148, height: 210 },
+  "A4 (210×297 мм)": { width: 210, height: 297 },
+  "90×50 мм": { width: 90, height: 50 },
+};
 </script>
 
 <template>
@@ -36,7 +40,7 @@ const availableSizes = ["A5 (148×210 мм)", "A4 (210×297 мм)", "90×50 мм
     icon="/icons/default.svg"
     :defaultValues="defaultValues"
     :enabledOptions="enabledOptions"
-    :availableSizes="availableSizes"
+    :sizes="sizes"
     :previewComponent="LeafletsPreview"
   />
 </template>
